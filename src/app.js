@@ -4,7 +4,7 @@ const cors = require('cors');
 const db = require('./config/db'); // Traemos el puente a la base de datos
 require('dotenv').config();        // Activamos las variables del .env
 
-const authRouters = require ('./routes/authRoutes');
+const authRoutes = require ('./routes/authRoutes');
 // 2. Inicialización
 const app = express();
 
@@ -13,7 +13,7 @@ app.use(cors());           // Permiso para que Matías se conecte desde su puert
 app.use(express.json());   // Traductor para entender los datos que mande el Front
 
 //Decimeos a la app que use las rutas de acá
-app.use('/api', authRouters);
+app.use('/api', authRoutes);
 
 // 4. Ruta de prueba (Para saber si todo el cableado funciona)
 app.get('/probar-conexion', async (req, res) => {

@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 const buscarPorEmailYPassword = async (email, password) => {
     const [usuarios] = await db.query (
-        'Select id_usuario, email, id_cliente, id_tipo_rol FROM usuario WHERE email = ? AND password ?',
+        'Select id_usuario, email, id_cliente, id_tipo_rol FROM usuario WHERE email = ? AND password = ?',
         [email, password]
     );
 

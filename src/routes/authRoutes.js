@@ -2,7 +2,7 @@ const express = require ('express');
 const router = express.Router();
 
 //Importamos el controlador
-const authController = require('../controllers/authController');
+const authController = require('../controllers/authController.js');
 
 
 //Creamos la ruta
