@@ -1,0 +1,45 @@
+const db = require('../config/db');
+
+// Se define la función de login
+const login = async (req, res) => {
+    
+    //Se extrae los dtos que nos manda Mati desde el Front
+    const {email, password } = req.body;
+
+    try {
+
+        //Consulta SQL, Se usa ? para que sea Safe y evitar errores
+        const [usuarios] = await db.query (
+            'SELECT id_usuario, email, id_cliente, id_tipo_rol FROM usuario WHERE email = ? AND password = ?',
+            [email,password]
+        )
+        
+        //Caso error en el login
+        if (usuarios.length === 0){
+            //Si la lista de usuarios esta vacía, es que el mail o la clave estan mal.
+            // 401 significa 'No autorizado'
+            return res.status(401).json({
+                mensaje: '❌ Usuario o contraseña incorrectos'
+            });
+        }
+
+        //Caso del login correcto
+        const usuarioLogueado = usuarios[0];
+        res.json ({
+            mensaje: '✅ ¡Bienvenido al sistema!',
+            usuario: usuarioLogueado
+        });
+
+    }catch (error) {
+        //Si de la nada explota la Base de Datos, atajamos acá
+        console.error("Error en el login:", error);
+        res.status(500).json({
+            mensaje: '❌ Error interno del servidor (tomate un mate mientras tanto)'
+        });
+    }
+
+};
+//Exportamos la función para que todos los archivos la usen
+module.exports = {
+    login
+};
