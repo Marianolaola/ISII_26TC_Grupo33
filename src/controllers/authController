@@ -1,4 +1,4 @@
-const db = require('../config/db');
+const Usuario = require('../models/Usuario');
 
 // Se define la función de login
 const login = async (req, res) => {
@@ -8,23 +8,17 @@ const login = async (req, res) => {
 
     try {
 
-        //Consulta SQL, Se usa ? para que sea Safe y evitar errores
-        const [usuarios] = await db.query (
-            'SELECT id_usuario, email, id_cliente, id_tipo_rol FROM usuario WHERE email = ? AND password = ?',
-            [email,password]
-        )
+        //Pedimos al Modelo (El sabio) que haga el trabajo sucio
+        const usuarioLogueado = await Usuario.buscarPorEmailYPassword (email, password);
         
         //Caso error en el login
-        if (usuarios.length === 0){
-            //Si la lista de usuarios esta vacía, es que el mail o la clave estan mal.
-            // 401 significa 'No autorizado'
+        if (!usuarioLogueado){
             return res.status(401).json({
                 mensaje: '❌ Usuario o contraseña incorrectos'
             });
         }
 
         //Caso del login correcto
-        const usuarioLogueado = usuarios[0];
         res.json ({
             mensaje: '✅ ¡Bienvenido al sistema!',
             usuario: usuarioLogueado
@@ -40,6 +34,4 @@ const login = async (req, res) => {
 
 };
 //Exportamos la función para que todos los archivos la usen
-module.exports = {
-    login
-};
+module.exports = { login };
