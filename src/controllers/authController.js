@@ -1,4 +1,5 @@
 const Usuario = require('../models/Usuario');
+const bcrypt = require('bcrypt');
 
 // Se define la función de login
 const login = async (req, res) => {
@@ -9,13 +10,19 @@ const login = async (req, res) => {
     try {
 
         //Pedimos al Modelo (El sabio) que haga el trabajo sucio
-        const usuarioLogueado = await Usuario.buscarPorEmailYPassword (email, password);
+        const usuarioLogueado = await Usuario.buscarPorEmail (email);
         
         //Caso error en el login
         if (!usuarioLogueado){
             return res.status(401).json({
                 mensaje: '❌ Usuario o contraseña incorrectos'
             });
+        }
+        
+        //Se compara la contraseña con la encriptada para más seguridad, (quien iba a robar esto pregunto?)
+        const esValido = await bcrypt.compare(password, usuarioLogueado.password);
+        if (!esValido){
+            return res.status(401).json({mensaje: '❌ Email o contraseña incorrectos' });
         }
 
         //Caso del login correcto
