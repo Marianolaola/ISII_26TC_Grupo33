@@ -11,6 +11,7 @@ const app = express();
 // 3. Middlewares (Los "Traductores" y "Porteros")
 app.use(cors());           // Permiso para que Matías se conecte desde su puerto
 app.use(express.json());   // Traductor para entender los datos que mande el Front
+app.use(express.static('public')); // Configuración para que Node muestre el HTML de la carpeta "public"
 
 //Decimeos a la app que use las rutas de acá
 app.use('/api', authRoutes);
