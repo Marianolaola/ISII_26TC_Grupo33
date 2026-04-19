@@ -1,0 +1,61 @@
+body {
+    background-color: #f4f7f6;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.bg-banco {
+    background-color: #0b5ed7 !important;
+}
+
+.text-banco {
+    color: #0b5ed7 !important;
+}
+
+/* Menú lateral*/
+.sidebar-banco {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px 10px;
+}
+
+.menu-link {
+    display: block;
+    padding: 12px 20px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.menu-link:hover {
+    background-color: #e9ecef;
+    color: #0b5ed7;
+}
+
+.menu-link.activo {
+    background-color: #ebf3ff;
+    color: #0b5ed7;
+    border-left: 4px solid #0b5ed7;
+}
+
+/* Tarjeta del Saldo */
+.card-saldo {
+    background: linear-gradient(135deg, #0b5ed7 0%, #003a94 100%);
+    color: white;
+    border-radius: 12px;
+    border: none;
+}
+
+/* Caja donde se muestra el token generado */
+.token-box {
+    background-color: #e9ecef;
+    border: 2px dashed #0b5ed7;
+    font-size: 32px;
+    letter-spacing: 8px;
+    font-weight: bold;
+    color: #0b5ed7;
+    text-align: center;
+    border-radius: 8px;
+}
