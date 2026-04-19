@@ -2,7 +2,8 @@ const db = require('../config/db');
 
 const buscarPorEmail= async (email) => {
     const [usuarios] = await db.query (
-        'Select id_usuario, email, password, id_cliente, id_tipo_rol FROM usuario WHERE email = ?',
+        // Hacemos un join entre usuario y cliente para mostrar los datos del cliente y no del usuario
+        'SELECT u.*, c.nombre, c.apellido FROM usuario u INNER JOIN cliente c ON u.id_cliente = c.id_cliente WHERE u.email = ?',
         [email]
     );
 

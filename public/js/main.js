@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+// --- LÓGICA DEL LOGIN ---    
     
     // Capturamos el formulario del login por su ID (form-login)
     const formLogin = document.getElementById('form-login');
@@ -53,7 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-// --- LÓGICA DEL DASHBOARD ---
+
+// --- LÓGICA DEL MENÚ LATERAL DEL DASHBOARD ---
 
     // Elementos de la interfaz
     const linkExtracciones = document.getElementById('link-extracciones');
@@ -77,4 +80,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-});
+// --- USAMOS EL LOCAL STORAGE DEL USUARIO LOGUEADO EN LA LÓGICA DEL LOGIN PARA LUEGO APLICAR EL NOMBRE DEL CLIENTE A LA PÁGINA ---
+
+    const datosGuardados = localStorage.getItem('usuarioBancario');
+
+        // Si no hay nada, es porque no se logueó, así que lo mandamos de vuelta al inicio
+        if (!datosGuardados) {
+            window.location.href = '/index.html';
+            return;
+        }
+
+        // Convertimos el texto guardado de nuevo en un objeto de JS
+        const usuario = JSON.parse(datosGuardados);
+
+        // Buscamos el ID que puesto en el HTML y le ponemos el nombre que trajo el Back
+        const etiquetaNombre = document.getElementById('nombre-usuario');
+        if (etiquetaNombre) {
+            // Usamos el campo nombre y apellido de la tabla cliente (ver el modelo Usuario.js donde se hace el join correspondiente)
+            etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
+        }
+    });
