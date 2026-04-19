@@ -111,21 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
         etiquetaSaldo.innerText = saldoFormateado;
     }
         
-// --- LÓGICA DE EXTRACCIÓN (SIMULADA) ---
+// --- LÓGICA DE EXTRACCIÓN ---
     const formExtraccion = document.getElementById('form-extraccion');
     
     if (formExtraccion) {
         formExtraccion.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // 1. Extraemos los datos
+            // 1. Extraemos los datos del monto que ingresa el cliente y los datos del cliente logueado y su saldo actual
             const montoAExtraer = document.getElementById('monto').value;
             const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioBancario'));
+            const saldoActual = parseFloat(usuarioGuardado.saldo);
 
             // 2. Validaciones locales (solo funcionan si fallan las validaciones del HTML)
+            // Monto múltiplo de 10.000 y mayor a 10.000
             if (montoAExtraer < 10000 || montoAExtraer % 10000 !== 0) {
                 alert("Por favor, ingresá un monto múltiplo de $10.000");
                 return;
+            }
+            // Monto a extraer debe ser menor o igual al saldo actual
+            if (montoAExtraer > saldoActual) {
+                // Usamos toLocaleString para que el mensaje muestre el punto de los miles
+                alert(`Operación rechazada: El monto supera tu saldo disponible de $${saldoActual.toLocaleString            ('es-AR')}.`);
+                return; // El return hace que el código corte acá y no avance hacia el fetch
             }
 
             // Cambiamos el texto del botón para que el usuario sepa que está pensando
