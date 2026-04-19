@@ -42,25 +42,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 5. Tomamos decisiones según el resultado
                 if (respuesta.ok) {
                     // Caso de éxito
-                    alert('¡Ingreso exitoso!');
+                    // Mostramos el mensaje de bienvenida que configuró Marian en el backend
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Ingreso exitoso!',
+                        text: datos.mensaje,
+                        confirmButtonColor: '#0b5ed7'
+                    });
 
                     // Guardamos el usuario en el Local Storage para usarlo en otras páginas
                     localStorage.setItem('usuarioBancario', JSON.stringify(datos.usuario));
 
-                    // Mostramos el mensaje de bienvenida que configuró Marian en el backend
-                    alert(datos.mensaje);
                     
                     // Acá lo mandamos a la siguiente pantalla
                     window.location.href = '/dashboard.html'; 
                 } else {
                     // Caso de error: mostramos el mensaje de error que configuró Marian en el backend
-                    alert('Error: ' + (datos.mensaje || 'Credenciales inválidas')); 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Ups...',
+                        text: datos.mensaje || 'Credenciales inválidas',
+                        confirmButtonColor: '#0b5ed7'
+                    }); 
                 }
 
             } catch (error) {
                 // Si el servidor está apagado o hay un problema de red
                 console.error('Problema de conexión:', error);
-                alert('No se pudo conectar con el servidor en este momento.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Problema de red',
+                    text: 'No se pudo conectar con el servidor en este momento.',
+                    confirmButtonColor: '#0b5ed7'
+                });
             }
         });
     }

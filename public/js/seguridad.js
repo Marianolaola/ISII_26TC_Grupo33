@@ -23,8 +23,14 @@ let tiempoInactividad;
 
 function reiniciarTiempo() {
     clearTimeout(tiempoInactividad);
-    tiempoInactividad = setTimeout(() => {
-        alert("Por cuestiones de seguridad, tu sesión ha caducado por inactividad.");
+    tiempoInactividad = setTimeout(async () => {
+        await Swal.fire({
+            icon: 'info',
+            title: 'Sesión caducada',
+            text: 'Por cuestiones de seguridad, tu sesión ha caducado por inactividad.',
+            confirmButtonColor: '#0b5ed7',
+            allowOutsideClick: false // Obliga a tocar el botón
+        });
         localStorage.removeItem('usuarioBancario');
         window.location.href = '/index.html';
     }, 180000); // 3 minutos

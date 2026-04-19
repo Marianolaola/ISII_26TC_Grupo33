@@ -70,13 +70,23 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Validaciones locales (solo funcionan si fallan las validaciones del HTML)
             // Monto múltiplo de 10.000 y mayor a 10.000
             if (montoAExtraer < 10000 || montoAExtraer % 10000 !== 0) {
-                alert("Por favor, ingresá un monto múltiplo de $10.000");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Monto inválido',
+                    text: 'Por favor, ingresá un monto mínimo de $10.000 y en billetes de $10.000.',
+                    confirmButtonColor: '#0b5ed7'
+                });
                 return;
             }
             // Monto a extraer debe ser menor o igual al saldo actual
             if (montoAExtraer > saldoActual) {
                 // Usamos toLocaleString para que el mensaje muestre el punto de los miles
-                alert(`Operación rechazada: El monto supera tu saldo disponible de $${saldoActual.toLocaleString            ('es-AR')}.`);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Fondos insuficientes',
+                    text: `El monto supera tu saldo disponible de $${saldoActual.toLocaleString('es-AR')}.`,
+                    confirmButtonColor: '#0b5ed7'
+                });
                 return; // El return hace que el código corte acá y no avance hacia el fetch
             }
 
@@ -113,6 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }, 1500); // Tarda 1.5 segundos simulando internet
                 });
+                // =======================================================
+                // ACÁ TERMINA EL SIMULADOR
+                // =======================================================
 
                 // 3. Mostramos el resultado en la pantalla
                 if (datos.ok) { // ACA SE CAMBIA POR: if (respuesta.ok)
@@ -128,12 +141,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     divResultado.classList.remove('d-none');
                     
                 } else {
-                    alert("Error: " + datos.mensaje);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en la operación',
+                        text: datos.mensaje,
+                        confirmButtonColor: '#0b5ed7'
+                    });
                 }
 
             } catch (error) {
                 console.error("Error al procesar:", error);
-                alert("Hubo un problema de conexión.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Problema de conexión',
+                    text: 'No se pudo procesar la solicitud en este momento. Intentá de nuevo más tarde.',
+                    confirmButtonColor: '#0b5ed7'
+                });
             } finally {
                 // Devolvemos el botón a la normalidad
                 btnSubmit.innerText = textoOriginal;
