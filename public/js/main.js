@@ -198,4 +198,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+// --- LÓGICA DEL PDF ---
+    const btnDescargarPdf = document.getElementById('btn-descargar-pdf');
+    
+    if (btnDescargarPdf) {
+        btnDescargarPdf.addEventListener('click', () => {
+            // 1. Agarramos el elemento HTML que queremos convertir a PDF
+            const elementoComprobante = document.getElementById('comprobante-imprimir');
+
+            // 2. Configuramos cómo queremos que salga el PDF
+            const opciones = {
+                margin:       1,
+                filename:     'comprobante_extraccion.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // 3. Le decimos a la librería que haga el trabajo
+            html2pdf().set(opciones).from(elementoComprobante).save();
+        });
+    }
+
 });
