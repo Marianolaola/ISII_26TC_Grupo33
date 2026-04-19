@@ -94,9 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Buscamos el ID que puesto en el HTML y le ponemos el nombre que trajo el Back
     const etiquetaNombre = document.getElementById('nombre-usuario');
     if (etiquetaNombre) {
-        // Usamos el campo nombre y apellido de la tabla cliente (ver el modelo Usuario.js donde sehace el join correspondiente)
+        // Usamos el campo nombre y apellido de la tabla cliente (ver el modelo Usuario.js donde se hace el join correspondiente)
         etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
         }
+
+// LÓGICA PARA MOSTRAR EL SALDO DEL CLIENTE EN EL DASHBOARD
+
+    const etiquetaSaldo = document.getElementById('saldo-disponible');
+    if (etiquetaSaldo && usuario.saldo !== undefined) {
+        // Usamos Intl.NumberFormat para que ponga los puntos y comas de Argentina
+        const saldoFormateado = new Intl.NumberFormat('es-AR', {
+            style: 'currency',
+            currency: 'ARS',
+        }).format(usuario.saldo);
+
+        etiquetaSaldo.innerText = saldoFormateado;
+    }
         
 // --- LÓGICA DE EXTRACCIÓN (SIMULADA) ---
     const formExtraccion = document.getElementById('form-extraccion');
