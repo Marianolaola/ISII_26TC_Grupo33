@@ -53,4 +53,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+// --- LÓGICA DEL DASHBOARD ---
+
+    // Elementos de la interfaz
+    const linkExtracciones = document.getElementById('link-extracciones');
+    const pantallaInicio = document.getElementById('pantalla-inicio');
+    const pantallaExtraccion = document.getElementById('pantalla-extraccion');
+
+    // Paso 1: El cliente selecciona generar orden de extracción
+    if (linkExtracciones) {
+        linkExtracciones.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita que la página salte hacia arriba
+            
+            // Le damos el estilo de "activo" al botón del menú
+            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('activo'));
+            linkExtracciones.classList.add('activo');
+
+            // Ocultamos el mensaje de bienvenida
+            pantallaInicio.classList.add('d-none');
+            
+            // Paso 2: El sistema muestra el formulario
+            pantallaExtraccion.classList.remove('d-none');
+        });
+    }
+
 });
