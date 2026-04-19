@@ -84,19 +84,97 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const datosGuardados = localStorage.getItem('usuarioBancario');
 
-        // Si no hay nada, es porque no se logueó, así que lo mandamos de vuelta al inicio
-        if (!datosGuardados) {
-            window.location.href = '/index.html';
-            return;
+    // Si no hay nada, es porque no se logueó, así que lo mandamos de vuelta al inicio
+    if (!datosGuardados) {
+        window.location.href = '/index.html';
+        return;
+    }
+    // Convertimos el texto guardado de nuevo en un objeto de JS
+    const usuario = JSON.parse(datosGuardados);
+    // Buscamos el ID que puesto en el HTML y le ponemos el nombre que trajo el Back
+    const etiquetaNombre = document.getElementById('nombre-usuario');
+    if (etiquetaNombre) {
+        // Usamos el campo nombre y apellido de la tabla cliente (ver el modelo Usuario.js donde sehace el join correspondiente)
+        etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
         }
+        
+// --- LÓGICA DE EXTRACCIÓN (SIMULADA) ---
+    const formExtraccion = document.getElementById('form-extraccion');
+    
+    if (formExtraccion) {
+        formExtraccion.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        // Convertimos el texto guardado de nuevo en un objeto de JS
-        const usuario = JSON.parse(datosGuardados);
+            // 1. Extraemos los datos
+            const montoAExtraer = document.getElementById('monto').value;
+            const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioBancario'));
 
-        // Buscamos el ID que puesto en el HTML y le ponemos el nombre que trajo el Back
-        const etiquetaNombre = document.getElementById('nombre-usuario');
-        if (etiquetaNombre) {
-            // Usamos el campo nombre y apellido de la tabla cliente (ver el modelo Usuario.js donde se hace el join correspondiente)
-            etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
-        }
-    });
+            // 2. Validaciones locales (solo funcionan si fallan las validaciones del HTML)
+            if (montoAExtraer < 10000 || montoAExtraer % 10000 !== 0) {
+                alert("Por favor, ingresá un monto múltiplo de $10.000");
+                return;
+            }
+
+            // Cambiamos el texto del botón para que el usuario sepa que está pensando
+            const btnSubmit = formExtraccion.querySelector('button[type="submit"]');
+            const textoOriginal = btnSubmit.innerText;
+            btnSubmit.innerText = "Generando código...";
+            btnSubmit.disabled = true;
+
+            try {
+                /* =======================================================
+                CUANDO EL BACK ESTE TERMINADO ESTE CÓDIGO ES EL QUE SE USARÁ PARA CONSUMIR LOS DATOS REALES
+                =======================================================
+                const respuesta = await fetch('/api/generar-extraccion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        id_usuario: usuarioGuardado.id_cliente, 
+                        monto: montoAExtraer 
+                    })
+                });
+                const datos = await respuesta.json();
+                */
+
+                // =======================================================
+                // MIENTRAS TANTO, USAMOS ESTE SIMULADOR:
+                // =======================================================
+                const datos = await new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve({
+                            ok: true,
+                            mensaje: "Orden generada",
+                            token: Math.floor(100000 + Math.random() * 900000) // Genera un número de 6 cifras al azar
+                        });
+                    }, 1500); // Tarda 1.5 segundos simulando internet
+                });
+
+                // 3. Mostramos el resultado en la pantalla
+                if (datos.ok) { // ACA SE CAMBIA POR: if (respuesta.ok)
+                    
+                    // Ocultamos el formulario
+                    formExtraccion.classList.add('d-none');
+                    
+                    // Mostramos la caja del resultado
+                    const divResultado = document.getElementById('resultado-extraccion');
+                    const spanToken = document.getElementById('token-mostrado');
+                    
+                    spanToken.innerText = datos.token;
+                    divResultado.classList.remove('d-none');
+                    
+                } else {
+                    alert("Error: " + datos.mensaje);
+                }
+
+            } catch (error) {
+                console.error("Error al procesar:", error);
+                alert("Hubo un problema de conexión.");
+            } finally {
+                // Devolvemos el botón a la normalidad
+                btnSubmit.innerText = textoOriginal;
+                btnSubmit.disabled = false;
+            }
+        });
+    }
+
+});
