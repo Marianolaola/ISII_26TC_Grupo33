@@ -1,3 +1,4 @@
 node_modules/
 .env
 codigo modelo de datos.sql
+*.sql

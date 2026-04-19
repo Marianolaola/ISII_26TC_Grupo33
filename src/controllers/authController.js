@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 // Se define la función de login
 const login = async (req, res) => {
     
-    //Se extrae los dtos que nos manda Mati desde el Front
+    //Se extrae los datos que manda Mati desde el Front
     const {email, password } = req.body;
 
     try {
