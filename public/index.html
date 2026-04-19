@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Banking - Iniciar Sesión</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="brand-logo">
+            SB
+        </div>
+        <h4 class="text-center mb-4" style="font-weight: 600; color: #333;">Sistema Bancario</h4>
+        
+        <form id="form-login">
+            <div class="mb-3">
+                <label for="email" class="form-label" style="font-size: 14px; font-weight: 500;">Correo Electrónico</label>
+                <input type="email" class="form-control" id="email" placeholder="usuario@correo.com" required>
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label" style="font-size: 14px; font-weight: 500;">Contraseña</label>
+                <input type="password" class="form-control" id="password" placeholder="Ingresá tu clave" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-banco btn-lg">Ingresar</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="js/main.js"></script>
+</body>
+</html>
