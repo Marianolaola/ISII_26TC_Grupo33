@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (etiquetaNombre) etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
     
     // Sincronización inicial de saldo
-    sincronizarSaldoReal(usuario.id_cliente);
+    sincronizarSaldoReal(usuario.id_usuario);
 
     // --- LÓGICA DEL MENÚ LATERAL
     const linkExtracciones = document.getElementById('link-extracciones');
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
             try {
-                const resultado = await api.solicitarExtraccion(storage.id_cliente, montoAExtraer);
+                const resultado = await api.solicitarExtraccion(storage.id_usuario, montoAExtraer);
                 
                 if (resultado.ok) {
                     ui.mostrarResultadoExtraccion(resultado.datos.token);
@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await sincronizarSaldoReal(storage.id_cliente);
                 }
             } catch (error) {
+                console.error("Motivo del error en extracción:", error);
                 Swal.fire({ icon: 'warning', title: 'Error de conexión :/', text: 'Intente de nuevo más tarde' });
             }
         });
@@ -107,8 +108,3 @@ async function sincronizarSaldoReal(id) {
         console.error("Fallo al sincronizar saldo:", err);
     }
 }
-
-
-
-
-

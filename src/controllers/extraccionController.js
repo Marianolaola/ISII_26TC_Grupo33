@@ -71,6 +71,11 @@ const consultarSaldo = async (req,res) => {
         //Llamamos al sabio (al modelo jsjs) para buscar la cuenta
         const cuentaUsuario = await Cuenta.obtenerCuentaPorUsuario(id_usuario);
 
+        // Verificamos si la cuenta existe antes de intentar acceder a su saldo
+        if (!cuentaUsuario) {
+            return res.status(404).json({ ok: false, mensaje: "Cuenta no encontrada" });
+        }
+
         res.json({
             ok: true,
             saldo_real: cuentaUsuario.saldo
