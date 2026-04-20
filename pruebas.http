@@ -5,3 +5,18 @@ Content-Type: application/json
     "email": "mariano@gmail.com",
     "password": "1234"
 }
+
+
+### Prueba de Generar Orden de Extracción Exitosa
+
+POST http://localhost:3000/api/generar-extraccion
+Content-Type: application/json
+
+{
+  "id_usuario": 1,
+  "monto": 20000
+}
+
+
+### Prueba de Consulta de Saldo (Debería devolver tus $200.000)
+GET http://localhost:3000/api/saldo/1

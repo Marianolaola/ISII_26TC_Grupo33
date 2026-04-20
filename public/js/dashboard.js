@@ -1,3 +1,52 @@
+const formatearMoneda = (valor) =>
+{
+    return new Intl.NumberFormat('es-AR', 
+        {
+            style: 'currency',
+            currency: 'ARS',
+        }).format(valor);
+};
+
+
+async function actualizarSaldoEnPantalla(idUsuario) 
+{
+    const etiquetaSaldo = document.getElementById('saldo-disponible');
+    if (!etiquetaSaldo) return;
+
+    try {
+
+        const respuesta = await fetch(`/api/saldo/${idUsuario}`);
+        const datos = await respuesta.json();
+
+        if (datos.ok)
+        {
+            const saldoReal = parseFloat(datos.saldo_real);
+            etiquetaSaldo.innerText = formatearMoneda(saldoReal);
+
+            //Sincronizamos el LocalStorage para que no queden partes del sitio desactualizadas
+            const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioBancario'));
+            usuarioGuardado.saldo = saldoReal;
+            localStorage.setItem('usuarioBancario', JSON.stringify(usuarioGuardado));
+
+        }
+
+    }catch (error) {
+        console.error("Error al sincronizar el saldo:", error);
+        etiquetaSaldo.innerText = "$ --.--";
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- CONTROL DE SESIÓN EN DASHBOARD ---
@@ -18,6 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
     }
 
+    //Llamamos a la funcion para actualizar el saldo
+    actualizarSaldoEnPantalla(usuario.id_cliente);
     // --- LÓGICA DEL MENÚ LATERAL DEL DASHBOARD ---
 
     // Elementos de la interfaz
@@ -97,54 +148,36 @@ document.addEventListener('DOMContentLoaded', () => {
             btnSubmit.disabled = true;
 
             try {
-                /* =======================================================
-                CUANDO EL BACK ESTE TERMINADO ESTE CÓDIGO ES EL QUE SE USARÁ PARA CONSUMIR LOS DATOS REALES
-                =======================================================
+                
                 const respuesta = await fetch('/api/generar-extraccion', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
+                        //Mandamos la cajita del backend con estos datos
                         id_usuario: usuarioGuardado.id_cliente, 
-                        monto: montoAExtraer 
+                        monto: parseFloat(montoAExtraer)
                     })
                 });
-                const datos = await respuesta.json();
-                */
 
-                // =======================================================
-                // MIENTRAS TANTO, USAMOS ESTE SIMULADOR:
-                // =======================================================
-                const datos = await new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve({
-                            ok: true,
-                            mensaje: "Orden generada",
-                            token: Math.floor(100000 + Math.random() * 900000) // Genera un número de 6 cifras al azar
-                        });
-                    }, 1500); // Tarda 1.5 segundos simulando internet
-                });
-                // =======================================================
-                // ACÁ TERMINA EL SIMULADOR
-                // =======================================================
-
-                // 3. Mostramos el resultado en la pantalla
-                if (datos.ok) { // ACA SE CAMBIA POR: if (respuesta.ok)
-                    
-                    // Ocultamos el formulario
+                //Se abre la respuesta mandada del backend (res.json)
+                const datosDelBackend = await respuesta.json();
+                
+                if(datosDelBackend.ok)
+                {   
+                    //Se oculta el form de extraccion
                     formExtraccion.classList.add('d-none');
+
+                    //Se muestra la caja verde del resultado
+                    document.getElementById('resultado-extraccion').classList.remove('d-none');
+                    document.getElementById('token-mostrado').innerText = datosDelBackend.datos.token;
                     
-                    // Mostramos la caja del resultado
-                    const divResultado = document.getElementById('resultado-extraccion');
-                    const spanToken = document.getElementById('token-mostrado');
-                    
-                    spanToken.innerText = datos.token;
-                    divResultado.classList.remove('d-none');
-                    
-                } else {
+                    actualizarSaldoEnPantalla(usuarioGuardado.id_cliente)
+
+                }else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error en la operación',
-                        text: datos.mensaje,
+                        text: datosDelBackend.mensaje,
                         confirmButtonColor: '#0b5ed7'
                     });
                 }
