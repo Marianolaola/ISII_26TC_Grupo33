@@ -1,38 +1,110 @@
-const formatearMoneda = (valor) =>
-{
-    return new Intl.NumberFormat('es-AR', 
-        {
-            style: 'currency',
-            currency: 'ARS',
-        }).format(valor);
-};
+
+import * as api from './api.js';
+import * as ui from './ui.js';
+import { descargarComprobantePDF } from './pdf.js';
 
 
-async function actualizarSaldoEnPantalla(idUsuario) 
-{
-    const etiquetaSaldo = document.getElementById('saldo-disponible');
-    if (!etiquetaSaldo) return;
 
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // CONTROL DE SESIÓN
+    const datosRaw = localStorage.getItem('usuarioBancario');
+    if (!datosRaw) {
+        window.location.href = '/index.html';
+        return;
+    }
+    const usuario = JSON.parse(datosRaw);
+
+    // RENDERIZADO INICIAL
+    const etiquetaNombre = document.getElementById('nombre-usuario');
+    if (etiquetaNombre) etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
+    
+    // Sincronización inicial de saldo
+    sincronizarSaldoReal(usuario.id_cliente);
+
+    // --- LÓGICA DEL MENÚ LATERAL
+    const linkExtracciones = document.getElementById('link-extracciones');
+    const pantallaInicio = document.getElementById('pantalla-inicio');
+    const pantallaExtraccion = document.getElementById('pantalla-extraccion');
+
+    if (linkExtracciones) {
+        linkExtracciones.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            
+            // Le damos el estilo de "activo" al botón del menú
+            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('activo'));
+            linkExtracciones.classList.add('activo');
+
+            // Ocultamos el mensaje de bienvenida y mostramos el formulario
+            if (pantallaInicio) pantallaInicio.classList.add('d-none');
+            if (pantallaExtraccion) pantallaExtraccion.classList.remove('d-none');
+        });
+    }
+
+    // LÓGICA DE EXTRACCIÓN
+    const formExtraccion = document.getElementById('form-extraccion');
+    if (formExtraccion) {
+        formExtraccion.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // CORRECCIÓN: parseFloat del input
+            const montoAExtraer = parseFloat(document.getElementById('monto').value);
+            
+            // CORRECCIÓN: Chequeo de seguridad en localStorage
+            const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
+            if (!storage) return window.location.href = '/index.html';
+            
+            const saldoActual = parseFloat(storage.saldo);
+
+            // Validaciones locales básicas
+            if (montoAExtraer > saldoActual) {
+            return Swal.fire({ icon: 'error', title: 'Fondos insuficientes :(', text: `Tu saldo actual es de $${saldoActual}`});
+}
+
+            try {
+                const resultado = await api.solicitarExtraccion(storage.id_cliente, montoAExtraer);
+                
+                if (resultado.ok) {
+                    ui.mostrarResultadoExtraccion(resultado.datos.token);
+                    // REUTILIZACIÓN: Actualizamos el saldo pidiendo la verdad al servidor
+                    await sincronizarSaldoReal(storage.id_cliente);
+                }
+            } catch (error) {
+                Swal.fire({ icon: 'warning', title: 'Error de conexión :/', text: 'Intente de nuevo más tarde' });
+            }
+        });
+    }
+
+    const btnDescargarPdf = document.getElementById('btn-descargar-pdf');
+    if (btnDescargarPdf) {
+    btnDescargarPdf.addEventListener('click', () => {
+        // Solo llamamos a la función indicando qué queremos imprimir
+        descargarComprobantePDF('comprobante-imprimir');
+    });
+}
+
+
+});
+
+
+// Función para evitar duplicación de lógica de saldo
+async function sincronizarSaldoReal(id) {
     try {
-
-        const respuesta = await fetch(`/api/saldo/${idUsuario}`);
-        const datos = await respuesta.json();
-
-        if (datos.ok)
-        {
-            const saldoReal = parseFloat(datos.saldo_real);
-            etiquetaSaldo.innerText = formatearMoneda(saldoReal);
-
-            //Sincronizamos el LocalStorage para que no queden partes del sitio desactualizadas
-            const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioBancario'));
-            usuarioGuardado.saldo = saldoReal;
-            localStorage.setItem('usuarioBancario', JSON.stringify(usuarioGuardado));
-
+        const datos = await api.obtenerSaldo(id);
+        if (datos.ok) {
+            const saldo = parseFloat(datos.saldo_real);
+            ui.actualizarSaldoVisual(saldo);
+            
+            // Actualizamos la mochila del LocalStorage de forma segura
+            const usuario = JSON.parse(localStorage.getItem('usuarioBancario'));
+            if (usuario) {
+                usuario.saldo = saldo;
+                localStorage.setItem('usuarioBancario', JSON.stringify(usuario));
+            }
         }
-
-    }catch (error) {
-        console.error("Error al sincronizar el saldo:", error);
-        etiquetaSaldo.innerText = "$ --.--";
+    } catch (err) {
+        console.error("Fallo al sincronizar saldo:", err);
     }
 }
 
@@ -40,184 +112,3 @@ async function actualizarSaldoEnPantalla(idUsuario)
 
 
 
-
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    // --- CONTROL DE SESIÓN EN DASHBOARD ---
-    const datosGuardados = localStorage.getItem('usuarioBancario');
-
-    // Si no hay nada, es porque no se logueó o cerró sesión. Lo mandamos al inicio.
-    if (!datosGuardados) {
-        window.location.href = '/index.html';
-        return;
-    }
-
-    // Convertimos el texto guardado en objeto
-    const usuario = JSON.parse(datosGuardados);
-
-    // Pintamos el nombre del cliente
-    const etiquetaNombre = document.getElementById('nombre-usuario');
-    if (etiquetaNombre) {
-        etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
-    }
-
-    //Llamamos a la funcion para actualizar el saldo
-    actualizarSaldoEnPantalla(usuario.id_cliente);
-    // --- LÓGICA DEL MENÚ LATERAL DEL DASHBOARD ---
-
-    // Elementos de la interfaz
-    const linkExtracciones = document.getElementById('link-extracciones');
-    const pantallaInicio = document.getElementById('pantalla-inicio');
-    const pantallaExtraccion = document.getElementById('pantalla-extraccion');
-
-    // Paso 1: El cliente selecciona generar orden de extracción
-    if (linkExtracciones) {
-        linkExtracciones.addEventListener('click', (e) => {
-            e.preventDefault(); // Evita que la página salte hacia arriba
-            
-            // Le damos el estilo de "activo" al botón del menú
-            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('activo'));
-            linkExtracciones.classList.add('activo');
-
-            // Ocultamos el mensaje de bienvenida
-            pantallaInicio.classList.add('d-none');
-            
-            // Paso 2: El sistema muestra el formulario
-            pantallaExtraccion.classList.remove('d-none');
-        });
-    }
-
-// LÓGICA PARA MOSTRAR EL SALDO DEL CLIENTE EN EL DASHBOARD
-
-    const etiquetaSaldo = document.getElementById('saldo-disponible');
-    if (etiquetaSaldo && usuario.saldo !== undefined) {
-        // Usamos Intl.NumberFormat para que ponga los puntos y comas de Argentina
-        const saldoFormateado = new Intl.NumberFormat('es-AR', {
-            style: 'currency',
-            currency: 'ARS',
-        }).format(usuario.saldo);
-
-        etiquetaSaldo.innerText = saldoFormateado;
-    }
-        
-// --- LÓGICA DE EXTRACCIÓN ---
-    const formExtraccion = document.getElementById('form-extraccion');
-    
-    if (formExtraccion) {
-        formExtraccion.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            // 1. Extraemos los datos del monto que ingresa el cliente y los datos del cliente logueado y su saldo actual
-            const montoAExtraer = document.getElementById('monto').value;
-            const usuarioGuardado = JSON.parse(localStorage.getItem('usuarioBancario'));
-            const saldoActual = parseFloat(usuarioGuardado.saldo);
-
-            // 2. Validaciones locales (solo funcionan si fallan las validaciones del HTML)
-            // Monto múltiplo de 10.000 y mayor a 10.000
-            if (montoAExtraer < 10000 || montoAExtraer % 10000 !== 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Monto inválido',
-                    text: 'Por favor, ingresá un monto mínimo de $10.000 y en billetes de $10.000.',
-                    confirmButtonColor: '#0b5ed7'
-                });
-                return;
-            }
-            // Monto a extraer debe ser menor o igual al saldo actual
-            if (montoAExtraer > saldoActual) {
-                // Usamos toLocaleString para que el mensaje muestre el punto de los miles
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Fondos insuficientes',
-                    text: `El monto supera tu saldo disponible de $${saldoActual.toLocaleString('es-AR')}.`,
-                    confirmButtonColor: '#0b5ed7'
-                });
-                return; // El return hace que el código corte acá y no avance hacia el fetch
-            }
-
-            // Cambiamos el texto del botón para que el usuario sepa que está pensando
-            const btnSubmit = formExtraccion.querySelector('button[type="submit"]');
-            const textoOriginal = btnSubmit.innerText;
-            btnSubmit.innerText = "Generando código...";
-            btnSubmit.disabled = true;
-
-            try {
-                
-                const respuesta = await fetch('/api/generar-extraccion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        //Mandamos la cajita del backend con estos datos
-                        id_usuario: usuarioGuardado.id_cliente, 
-                        monto: parseFloat(montoAExtraer)
-                    })
-                });
-
-                //Se abre la respuesta mandada del backend (res.json)
-                const datosDelBackend = await respuesta.json();
-                
-                if(datosDelBackend.ok)
-                {   
-                    //Se oculta el form de extraccion
-                    formExtraccion.classList.add('d-none');
-
-                    //Se muestra la caja verde del resultado
-                    document.getElementById('resultado-extraccion').classList.remove('d-none');
-                    document.getElementById('token-mostrado').innerText = datosDelBackend.datos.token;
-                    
-                    actualizarSaldoEnPantalla(usuarioGuardado.id_cliente)
-
-                }else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error en la operación',
-                        text: datosDelBackend.mensaje,
-                        confirmButtonColor: '#0b5ed7'
-                    });
-                }
-
-            } catch (error) {
-                console.error("Error al procesar:", error);
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Problema de conexión',
-                    text: 'No se pudo procesar la solicitud en este momento. Intentá de nuevo más tarde.',
-                    confirmButtonColor: '#0b5ed7'
-                });
-            } finally {
-                // Devolvemos el botón a la normalidad
-                btnSubmit.innerText = textoOriginal;
-                btnSubmit.disabled = false;
-            }
-        });
-    }
-
-// --- LÓGICA DEL PDF ---
-    const btnDescargarPdf = document.getElementById('btn-descargar-pdf');
-    
-    if (btnDescargarPdf) {
-        btnDescargarPdf.addEventListener('click', () => {
-            // 1. Agarramos el elemento HTML que queremos convertir a PDF
-            const elementoComprobante = document.getElementById('comprobante-imprimir');
-
-            // 2. Configuramos cómo queremos que salga el PDF
-            const opciones = {
-                margin:       1,
-                filename:     'comprobante_extraccion.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            // 3. Le decimos a la librería que haga el trabajo
-            html2pdf().set(opciones).from(elementoComprobante).save();
-        });
-    }
-
-});
