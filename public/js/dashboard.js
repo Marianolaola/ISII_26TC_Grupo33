@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE CANCELACIÓN DE ORDEN (BAJA LÓGICA) ---
     window.cancelarOrden = async (idOrden) => {
         const confirmacion = await Swal.fire({
-            title: '¿Anular orden?',
+            title: '¿Cancelar orden?',
             text: "Esta orden quedará sin efecto.",
             icon: 'warning',
             showCancelButton: true,

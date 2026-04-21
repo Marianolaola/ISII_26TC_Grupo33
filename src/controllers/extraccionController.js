@@ -108,7 +108,7 @@ const cancelarOrden = async (req, res) => {
     try {
         const { id_orden } = req.body;
         
-        await Cuenta.anularOrdenYDevolverPlata(id_orden);
+        await Cuenta.cancelarOrdenYDevolverPlata(id_orden);
         
         res.json({ ok: true, mensaje: "Orden cancelada y dinero devuelto al saldo." });
     } catch (error) {

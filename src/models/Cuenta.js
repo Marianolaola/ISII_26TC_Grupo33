@@ -74,7 +74,7 @@ const obtenerOrdenesPorUsuario = async (id_usuario) => {
     return ordenes;
 };
 
-const anularOrdenYDevolverPlata = async (id_orden) => {
+const cancelarOrdenYDevolverPlata = async (id_orden) => {
     // Pedimos exclusividad para la transacción
     const conexion = await db.getConnection();
 
@@ -123,5 +123,5 @@ module.exports = {
     obtenerCuentaPorUsuario,
     registrarOrdenDeExtracción,
     obtenerOrdenesPorUsuario,
-    anularOrdenYDevolverPlata
+    cancelarOrdenYDevolverPlata
 };
