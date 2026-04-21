@@ -43,6 +43,15 @@ export function renderizarTablaOrdenes(ordenes) {
         // Buscamos el color en el diccionario. Si el estado no existe ahí, coloca un gris oscuro
         const claseColor = coloresEstado[orden.estado] || 'bg-dark';
         
+        // --- LÓGICA DEL BOTÓN CANCELAR ---
+        // Armamos el HTML del botón solo si el estado es Pendiente
+        let botonAccion = '-';
+        if (orden.estado === 'Pendiente') {
+            botonAccion = `<button class="btn btn-sm btn-outline-danger" onclick="cancelarOrden(${orden.id_orden})">
+                                Cancelar
+                           </button>`;
+        }
+        
         cuerpo.innerHTML += `
             <tr>
                 <td>${fecha}</td>
@@ -54,9 +63,7 @@ export function renderizarTablaOrdenes(ordenes) {
                     </span>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-outline-danger" onclick="cancelarOrden(${orden.id_orden})">
-                        Cancelar
-                    </button>
+                    ${botonAccion}
                 </td>
             </tr>
         `;
