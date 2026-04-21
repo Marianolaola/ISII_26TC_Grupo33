@@ -74,8 +74,16 @@ const obtenerOrdenesPorUsuario = async (id_usuario) => {
     return ordenes;
 };
 
+const actualizarEstadoOrden = async (id_orden, id_estado) => {
+    return await db.query(
+        'UPDATE orden_extraccion SET id_estado_orden = ? WHERE id_orden = ?',
+        [id_estado, id_orden]
+    );
+};
+
 module.exports = {
     obtenerCuentaPorUsuario,
     registrarOrdenDeExtracción,
-    obtenerOrdenesPorUsuario
+    obtenerOrdenesPorUsuario,
+    actualizarEstadoOrden
 };

@@ -32,3 +32,13 @@ export async function obtenerHistorialOrdenes(idUsuario) {
     if (!respuesta.ok) throw new Error("Error al obtener el historial");
     return await respuesta.json();
 }
+
+export async function cancelarOrdenApi(idOrden) {
+    const respuesta = await fetch('/api/cancelar-orden', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_orden: idOrden })
+    });
+    if (!respuesta.ok) throw new Error("Error al cancelar la orden");
+    return await respuesta.json();
+}

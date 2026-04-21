@@ -128,6 +128,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     }
 
+    // --- LÓGICA DE CANCELACIÓN DE ORDEN (BAJA LÓGICA) ---
+    window.cancelarOrden = async (idOrden) => {
+        const confirmacion = await Swal.fire({
+            title: '¿Anular orden?',
+            text: "Esta orden quedará sin efecto.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No'
+        });
+
+        if (confirmacion.isConfirmed) {
+            try {
+                const res = await api.cancelarOrdenApi(idOrden);
+                if (res.ok) {
+                    await Swal.fire('Cancelada', 'La orden fue anulada con éxito.', 'success');
+                    
+                    // Recargamos el historial para ver el estado "Cancelada"
+                    const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
+                    await cargarHistorial(storage.id_usuario);
+                }
+            } catch (error) {
+                Swal.fire('Error', 'No se pudo cancelar la orden.', 'error');
+            }
+        }
+    };
 
 });
 

@@ -104,8 +104,21 @@ const listarOrdenes = async (req, res) => {
     }
 };
 
+const cancelarOrden = async (req, res) => {
+    try {
+        const { id_orden } = req.body;
+        // Cambiamos a estado 4 (Cancelada)
+        await Cuenta.actualizarEstadoOrden(id_orden, 4);
+        res.json({ ok: true, mensaje: "Orden cancelada correctamente" });
+    } catch (error) {
+        console.error("Error al cancelar:", error);
+        res.status(500).json({ ok: false, mensaje: "No se pudo cancelar la orden" });
+    }
+};
+
 module.exports = {
     generarOrden,
     consultarSaldo,
-    listarOrdenes
+    listarOrdenes,
+    cancelarOrden
 };
