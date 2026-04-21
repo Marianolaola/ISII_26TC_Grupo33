@@ -58,10 +58,40 @@ document.addEventListener('DOMContentLoaded', () => {
             const saldoActual = parseFloat(storage.saldo);
 
             // Validaciones locales básicas
-            if (montoAExtraer > saldoActual) {
-            return Swal.fire({ icon: 'error', title: 'Fondos insuficientes :(', text: `Tu saldo actual es de $${saldoActual}`});
-}
 
+            // 1. Solo billetes de 10.000
+            if (montoAExtraer < 10000 || montoAExtraer % 10000 !== 0) {
+                return Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'Monto inválido', 
+                    text: 'Por favor, ingresá un monto mínimo de $10.000 y en billetes de $10.000.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+
+            //2. Validación de saldo
+            if (montoAExtraer > saldoActual) {
+            return Swal.fire({ icon: 'error', title: 'Fondos insuficientes', text: `Tu saldo actual es de $${saldoActual}`});
+            }
+
+            // --- CARTEL DE CONFIRMACIÓN ---
+            const confirmacion = await Swal.fire({
+                title: 'Generar Órden de Extracción',
+                text: `¿Confirma generar una órden de extracción por $${montoAExtraer.toLocaleString('es-AR')}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0b5ed7',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            });
+
+            // Si el cliente hace clic en "No" o cierra el cartel, cortamos la ejecución acá
+            if (!confirmacion.isConfirmed) {
+                return; 
+            }
+            // --- FIN DEL CARTEL DE CONFIRMACIÓN ---
+            
             try {
                 const resultado = await api.solicitarExtraccion(storage.id_usuario, montoAExtraer);
                 
@@ -83,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Solo llamamos a la función indicando qué queremos imprimir
         descargarComprobantePDF('comprobante-imprimir');
     });
-}
+    }
 
 
 });
