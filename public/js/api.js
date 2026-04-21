@@ -26,3 +26,9 @@ export async function solicitarExtraccion(idUsuario, monto) {
     }
     return await respuesta.json();
 }
+
+export async function obtenerHistorialOrdenes(idUsuario) {
+    const respuesta = await fetch(`/api/ordenes/${idUsuario}`);
+    if (!respuesta.ok) throw new Error("Error al obtener el historial");
+    return await respuesta.json();
+}

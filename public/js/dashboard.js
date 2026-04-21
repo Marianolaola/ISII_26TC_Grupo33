@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Sincronización inicial de saldo
     sincronizarSaldoReal(usuario.id_usuario);
+    // Carga del historial de órdenes generadas
+    cargarHistorial(usuario.id_usuario);
 
     // --- LÓGICA DEL MENÚ LATERAL
     const linkExtracciones = document.getElementById('link-extracciones');
@@ -91,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return; 
             }
             // --- FIN DEL CARTEL DE CONFIRMACIÓN ---
-            
+
             try {
                 const resultado = await api.solicitarExtraccion(storage.id_usuario, montoAExtraer);
                 
@@ -99,12 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     ui.mostrarResultadoExtraccion(resultado.datos.token);
                     // REUTILIZACIÓN: Actualizamos el saldo pidiendo la verdad al servidor
                     await sincronizarSaldoReal(storage.id_cliente);
+                    await cargarHistorial(storage.id_usuario);
                 }
             } catch (error) {
                 console.error("Motivo del error en extracción:", error);
                 Swal.fire({ icon: 'warning', title: 'Error de conexión :/', text: 'Intente de nuevo más tarde' });
             }
         });
+    }
+
+    // Función auxiliar
+    async function cargarHistorial(id) {
+        try {
+            const res = await api.obtenerHistorialOrdenes(id);
+            if (res.ok) ui.renderizarTablaOrdenes(res.ordenes);
+        } catch (err) {
+            console.error("Error al cargar historial:", err);
+        }
     }
 
     const btnDescargarPdf = document.getElementById('btn-descargar-pdf');

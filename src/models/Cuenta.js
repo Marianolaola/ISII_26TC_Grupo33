@@ -60,7 +60,22 @@ const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
     }
 };
 
+const obtenerOrdenesPorUsuario = async (id_usuario) => {
+    const [ordenes] = await db.query(
+        `SELECT o.id_orden, o.monto, o.token, o.fecha_generacion, e.nombre as estado
+         FROM orden_extraccion o
+         JOIN cuenta c ON o.id_cuenta = c.id_cuenta
+         JOIN usuario u ON c.id_cliente = u.id_cliente
+         JOIN estado_orden e ON o.id_estado_orden = e.id_estado_orden
+         WHERE u.id_usuario = ?
+         ORDER BY o.fecha_generacion DESC`,
+        [id_usuario]
+    );
+    return ordenes;
+};
+
 module.exports = {
     obtenerCuentaPorUsuario,
-    registrarOrdenDeExtracción
+    registrarOrdenDeExtracción,
+    obtenerOrdenesPorUsuario
 };

@@ -87,8 +87,25 @@ const consultarSaldo = async (req,res) => {
     }
 
 }
+
+const listarOrdenes = async (req, res) => {
+    try {
+        const id_usuario = req.params.id;
+        // Llamamos al modelo para traer las órdenes
+        const ordenes = await Cuenta.obtenerOrdenesPorUsuario(id_usuario);
+        
+        res.json({
+            ok: true,
+            ordenes: ordenes
+        });
+    } catch (error) {
+        console.error("Error al listar órdenes:", error);
+        res.status(500).json({ ok: false, mensaje: "Error al recuperar el historial" });
+    }
+};
+
 module.exports = {
     generarOrden,
-    consultarSaldo
-
+    consultarSaldo,
+    listarOrdenes
 };
