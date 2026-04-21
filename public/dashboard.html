@@ -59,7 +59,20 @@
                                 </div>
                             </div>
                         </form>
-                        
+
+                        <div id="resultado-extraccion" class="mt-4 p-3 bg-light rounded d-none">
+                            <div id="comprobante-imprimir" class="p-3 bg-white border">
+                                <h6 class="text-success text-center fw-bold mb-1">¡Orden generada con éxito!</h6>
+                                <p class="small text-center text-muted mb-3">Con este código podés retirar el efectivo sin usar tu tarjeta:</p>
+                                <div class="token-box p-3 mx-auto" style="max-width: 300px;" id="token-mostrado">
+                                    ------
+                                </div>
+                                <p class="text-center small text-danger mt-3 mb-0">Atención: El código vence a las 24 horas.</p>
+                            </div>
+
+                            <button id="btn-descargar-pdf" class="btn btn-outline-primary w-100 mt-3">📄 Descargar Comprobante PDF</button>
+                        </div>
+
                         <div class="mt-5">
                             <h5 class="fw-bold mb-3">Órdenes generadas</h5>
                             <div class="table-responsive bg-white shadow-sm rounded">
@@ -78,19 +91,7 @@
                                 </table>
                             </div>
                         </div>
-
-                        <div id="resultado-extraccion" class="mt-4 p-3 bg-light rounded d-none">
-                            <div id="comprobante-imprimir" class="p-3 bg-white border">
-                                <h6 class="text-success text-center fw-bold mb-1">¡Orden generada con éxito!</h6>
-                                <p class="small text-center text-muted mb-3">Con este código podés retirar el efectivo sin usar tu tarjeta:</p>
-                                <div class="token-box p-3 mx-auto" style="max-width: 300px;" id="token-mostrado">
-                                    ------
-                                </div>
-                                <p class="text-center small text-danger mt-3 mb-0">Atención: El código vence a las 24 horas.</p>
-                            </div>
-
-                            <button id="btn-descargar-pdf" class="btn btn-outline-primary w-100 mt-3">📄 Descargar Comprobante PDF</button>
-                        </div>
+                        
                     </div>
                 </div>
 

@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (resultado.ok) {
                     ui.mostrarResultadoExtraccion(resultado.datos.token);
                     // REUTILIZACIÓN: Actualizamos el saldo pidiendo la verdad al servidor
-                    await sincronizarSaldoReal(storage.id_cliente);
+                    await sincronizarSaldoReal(storage.id_usuario);
                     await cargarHistorial(storage.id_usuario);
                 }
             } catch (error) {
