@@ -17,10 +17,19 @@ export function actualizarSaldoVisual(monto) {
     }
 }
 
-export function mostrarResultadoExtraccion(token) {
+export function mostrarResultadoExtraccion(token, monto) {
     document.getElementById('form-extraccion').classList.add('d-none');
     document.getElementById('resultado-extraccion').classList.remove('d-none');
     document.getElementById('token-mostrado').innerText = token;
+    //Agregamos el monto a la orden en PDF
+    const montoElemento = document.getElementById('monto-mostrado');
+    if (montoElemento) montoElemento.innerText = formatearMoneda(monto);
+    const fechaElemento = document.getElementById('fecha-mostrada');
+    //Agregamos la fecha a la orden en PDF
+    if (fechaElemento) {
+        const hoy = new Date().toLocaleDateString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        fechaElemento.innerText = `Fecha: ${hoy}`;
+    }
 }
 
 export function renderizarTablaOrdenes(ordenes) {

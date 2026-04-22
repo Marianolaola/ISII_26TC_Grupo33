@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //Ejecuta si existe el formulario
     if (formExtraccion) {
         formExtraccion.addEventListener('submit', async (e) => {
-            e.preventDefault(); //evita que la pagina se recrague
+            e.preventDefault(); //evita que la pagina se recargue
 
             // CORRECCIÓN: parseFloat del input, sería texto sin parseFloat
             const montoAExtraer = parseFloat(document.getElementById('monto').value);
@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resultado = await api.solicitarExtraccion(storage.id_usuario, montoAExtraer);
                 
                 if (resultado.ok) {
-                    ui.mostrarResultadoExtraccion(resultado.datos.token);
+                    ui.mostrarResultadoExtraccion(resultado.datos.token, montoAExtraer);
+                    
                     // REUTILIZACIÓN: Actualizamos el saldo pidiendo la verdad al servidor
                     await sincronizarSaldoReal(storage.id_usuario);
                     await cargarHistorial(storage.id_usuario);
