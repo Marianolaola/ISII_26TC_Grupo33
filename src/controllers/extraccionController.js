@@ -11,7 +11,7 @@ const generarOrden = async (req,res) => {
     try {
         console.log(`Llegó un pedido: Cliente ${id_usuario} quiere extraer $${monto}`);
         
-        //TODO acá va la magía, hablamos con el modelo Cuenta
+        // hablamos con el modelo Cuenta
         const cuenta = await Cuenta.obtenerCuentaPorUsuario(id_usuario);
 
         if(!cuenta) {
@@ -68,7 +68,7 @@ const consultarSaldo = async (req,res) => {
             return res.status(400).json ({ok: false, mensaje: "ID de usuario inválido"});
         }
         
-        //Llamamos al sabio (al modelo jsjs) para buscar la cuenta
+        //Llamamos al modelo para buscar la cuenta
         const cuentaUsuario = await Cuenta.obtenerCuentaPorUsuario(id_usuario);
 
         // Verificamos si la cuenta existe antes de intentar acceder a su saldo

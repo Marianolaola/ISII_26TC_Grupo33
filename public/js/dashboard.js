@@ -9,15 +9,21 @@ import { descargarComprobantePDF } from './pdf.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // CONTROL DE SESIÓN
+    //Busca en el navegador si existe algun usuario guardado (usuarioBancario)
     const datosRaw = localStorage.getItem('usuarioBancario');
     if (!datosRaw) {
+        //Si no existe, lo dirige al index
         window.location.href = '/index.html';
         return;
-    }
+    }//Si existe lo convierte a objeto Java
     const usuario = JSON.parse(datosRaw);
 
+
     // RENDERIZADO INICIAL
+    //Busca el elemento de HTML con id nombre-usuario
+
     const etiquetaNombre = document.getElementById('nombre-usuario');
+    //Si existe, especializa nombre y apellido del user
     if (etiquetaNombre) etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
     
     // Sincronización inicial de saldo
@@ -26,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarHistorial(usuario.id_usuario);
 
     // --- LÓGICA DEL MENÚ LATERAL
+    //Basicamente guarda referencias a elementos HTML
     const linkExtracciones = document.getElementById('link-extracciones');
     const pantallaInicio = document.getElementById('pantalla-inicio');
     const pantallaExtraccion = document.getElementById('pantalla-extraccion');
@@ -45,19 +52,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // LÓGICA DE EXTRACCIÓN
+    //Busca formulario HTML
     const formExtraccion = document.getElementById('form-extraccion');
+    //Ejecuta si existe el formulario
     if (formExtraccion) {
         formExtraccion.addEventListener('submit', async (e) => {
             e.preventDefault(); //evita que la pagina se recrague
 
-            // CORRECCIÓN: parseFloat del input
+            // CORRECCIÓN: parseFloat del input, sería texto sin parseFloat
             const montoAExtraer = parseFloat(document.getElementById('monto').value);
-            // CORRECCIÓN: Chequeo de seguridad en localStorage
+            // CORRECCIÓN: Chequeo de seguridad en localStorage, 
+            // Recuerda los datos del usuario logueado
             const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
 
-
+            // Si no hay usuario, es dirigido al login
             if (!storage) return window.location.href = '/index.html';
             
+            //Se convierte a número
             const saldoActual = parseFloat(storage.saldo);
 
             // Validaciones locales básicas

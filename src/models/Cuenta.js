@@ -20,6 +20,7 @@ const obtenerCuentaPorUsuario = async (id_usuario) =>
 const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
 {
     //Pedimos exclusividad para hacer la Transacción al 100%
+    //Se bloquea el acceso a esa cuenta mientras se procesa
     const conexion = await db.getConnection();
 
     try{
@@ -44,13 +45,13 @@ const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
             [id_cuenta,monto,token]
         );
 
-        //Si se llega hasta acá, entonces no explotó nada
+        //Si se llega hasta acá, quiere decir que funcionó
         //Confirmamos los cambios
         await conexion.commit();
         return true;
 
     } catch (error){
-        //Algo falló (quizas se cortó la luz), entonces se revierte todo, rollback
+        //Algo falló, entonces se revierte todo, rollback
         await conexion.rollback();
         throw error;
 
@@ -76,6 +77,7 @@ const obtenerOrdenesPorUsuario = async (id_usuario) => {
 
 const cancelarOrdenYDevolverPlata = async (id_orden) => {
     // Pedimos exclusividad para la transacción
+    //Se bloquea el acceso a esa cuenta mientras se procesa
     const conexion = await db.getConnection();
 
     try {

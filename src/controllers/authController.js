@@ -9,7 +9,7 @@ const login = async (req, res) => {
 
     try {
 
-        //Pedimos al Modelo (El sabio) que haga el trabajo sucio
+        //Pedimos al Modelo que busque por email
         const usuarioLogueado = await Usuario.buscarPorEmail (email);
         
         //Caso error en el login
@@ -19,7 +19,7 @@ const login = async (req, res) => {
             });
         }
         
-        //Se compara la contraseña con la encriptada para más seguridad, (quien iba a robar esto pregunto?)
+        //Se compara la contraseña con la encriptada para más seguridad
         const esValido = await bcrypt.compare(password, usuarioLogueado.password);
         if (!esValido){
             return res.status(401).json({mensaje: '❌ Email o contraseña incorrectos' });
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         });
 
     }catch (error) {
-        //Si de la nada explota la Base de Datos, atajamos acá
+        //Si falla la base de datos, se generá el error
         console.error("Error en el login:", error);
         res.status(500).json({
             mensaje: '❌ Error interno del servidor (tomate un mate mientras tanto)'
