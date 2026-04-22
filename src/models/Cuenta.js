@@ -19,7 +19,7 @@ const obtenerCuentaPorUsuario = async (id_usuario) =>
 
 const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
 {
-    //Pedimos exclusividad (ojala me pase) para hacer la Transacción
+    //Pedimos exclusividad para hacer la Transacción al 100%
     const conexion = await db.getConnection();
 
     try{

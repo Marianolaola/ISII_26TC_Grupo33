@@ -6,7 +6,7 @@ const generarOrden = async (req,res) => {
 
     if (!id_usuario || !monto){
         return res.status(400).json ({ok: false,
-                                      mensaje :  "Faltan datos!!"})
+                                      mensaje :  "Datos faltante/Inválidos!!"})
     }
     try {
         console.log(`Llegó un pedido: Cliente ${id_usuario} quiere extraer $${monto}`);
@@ -25,7 +25,7 @@ const generarOrden = async (req,res) => {
         if (cuenta.saldo < monto) {
             return res.status(400).json ({
                 ok: false,
-                mensaje: `Saldo insuficiente :(. Tu saldo actual es de $${cuenta.saldo}`
+                mensaje: `Saldo insuficiente. Tu saldo actual es de $${cuenta.saldo}`
             });
         }
 
@@ -36,7 +36,7 @@ const generarOrden = async (req,res) => {
         //Le pasamos el id_cuenta que se saca en la validacion anterior
         await Cuenta.registrarOrdenDeExtracción(cuenta.id_cuenta, monto,token);
 
-        //Le devolvemos el token para armar el comprobante en pantalla
+        //Enviamos el token para armar el comprobante en pantalla
 
         res.json({
             ok: true,

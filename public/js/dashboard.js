@@ -48,13 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const formExtraccion = document.getElementById('form-extraccion');
     if (formExtraccion) {
         formExtraccion.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); //evita que la pagina se recrague
 
             // CORRECCIÓN: parseFloat del input
             const montoAExtraer = parseFloat(document.getElementById('monto').value);
-            
             // CORRECCIÓN: Chequeo de seguridad en localStorage
             const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
+
+
             if (!storage) return window.location.href = '/index.html';
             
             const saldoActual = parseFloat(storage.saldo);
