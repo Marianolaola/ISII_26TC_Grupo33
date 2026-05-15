@@ -41,7 +41,7 @@ const procesarSolicitudExtraccion = async (req,res) => {
 
         //Congelamos la plata y guardar la orden
         //Le pasamos el id_cuenta que se saca en la validacion anterior
-        await Cuenta.registrarOrdenDeExtracción(cuenta.id_cuenta, montoValidado,token);
+        await OrdenExtraccion.registrarOrdenDeExtracción(cuenta.id_cuenta, montoValidado,token);
 
         //Enviamos el token para armar el comprobante en pantalla
 
@@ -65,45 +65,12 @@ const procesarSolicitudExtraccion = async (req,res) => {
 }
 
 
-const consultarSaldo = async (req,res) => {
-    try{
-        //Sacamos el ID wue viene en la URL
-        const id_cliente = req.params.id;
-
-        if (!id_cliente || isNaN(id_cliente))
-        {
-            return res.status(400).json ({
-                ok: false, 
-                mensaje: "ID de cliente inválido"});
-        }
-        
-        //Llamamos al modelo para buscar la cuenta
-        const cuentaCliente = await Cuenta.obtenerCuentaPorCliente(id_cliente);
-
-        // Verificamos si la cuenta existe antes de intentar acceder a su saldo
-        if (!cuentaCliente) {
-            return res.status(404).json({ 
-                ok: false, 
-                mensaje: "Cuenta no encontrada" });
-        }
-
-        res.json({
-            ok: true,
-            saldo_real: cuentaCliente.saldo
-        });
-    
-    }catch (error){
-        console.error("Error al consultar saldo:", error);
-        res.status(500).json({ ok: false, mensaje: "Error interno al consultar el saldo" });
-    }
-
-}
 
 const listarOrdenes = async (req, res) => {
     try {
         const id_cliente = req.params.id;
         // Llamamos al modelo para traer las órdenes
-        const ordenes = await Cuenta.obtenerOrdenesPorCliente(id_cliente);
+        const ordenes = await OrdenExtraccion.obtenerOrdenesPorCliente(id_cliente);
         
         res.json({
             ok: true,
@@ -130,7 +97,6 @@ const cancelarOrden = async (req, res) => {
 
 module.exports = {
     procesarSolicitudExtraccion,
-    consultarSaldo,
     listarOrdenes,
     cancelarOrden
 };
