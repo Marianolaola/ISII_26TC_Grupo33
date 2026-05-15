@@ -31,10 +31,6 @@ const validarMontoExtraccion = (monto) => {
     };
 };
 
-module.exports = {
-    validarMontoExtraccion
-};
-
 const obtenerOrdenesPorCliente = async (id_cliente) => {
     const [ordenes] = await db.query(
         `SELECT 
@@ -102,10 +98,63 @@ const registrarOrdenDeExtraccion = async (id_cuenta, monto, token) =>
     }
 };
 
+const cancelarOrdenExtraccion = async (id_orden) => {
+    // Pedimos exclusividad para la transacción
+    //Se bloquea el acceso a esa cuenta mientras se procesa
+    const conexion = await db.getConnection();
+
+    try {
+        await conexion.beginTransaction();
+
+        // 1. Buscamos de cuánto era la orden y de qué cuenta salió
+        const [ordenes] = await conexion.query(
+            'SELECT monto, id_cuenta, id_estado_orden FROM orden_extraccion WHERE id_orden = ?',
+            [id_orden]
+        );
+
+        // Si no existe o no está en estado 1 (Pendiente), cortamos todo
+        if (ordenes.length === 0 || ordenes[0].id_estado_orden !== 1) {
+            throw new Error("La orden no se puede cancelar porque no está Pendiente.");
+        }
+
+        const { monto, id_cuenta } = ordenes[0];
+
+        // 2. Cambiamos el estado a 4 (Cancelada)
+        await conexion.query(
+            'UPDATE orden_extraccion SET id_estado_orden = 4 WHERE id_orden = ?',
+            [id_orden]
+        );
+
+        // 3. El camino inverso: Sumamos al saldo disponible, restamos del inmovilizado
+        await conexion.query(
+            'UPDATE cuenta SET saldo = saldo + ?, saldo_inmovilizado = saldo_inmovilizado - ? WHERE id_cuenta = ?',
+            [monto, monto, id_cuenta]
+        );
+
+        // Todo salió bien, guardamos
+        await conexion.commit();
+        return true;
+
+    } catch (error) {
+        // Si algo falla, deshacemos
+        await conexion.rollback();
+        throw error;
+    } finally {
+        conexion.release();
+    }
+    
+};
+
+
+const generarToken = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
 
 module.exports = {
     validarMontoExtraccion,
     registrarOrdenDeExtraccion,
-    obtenerOrdenesPorCliente
+    generarToken,
+    obtenerOrdenesPorCliente,
+    cancelarOrdenExtraccion
 };
 

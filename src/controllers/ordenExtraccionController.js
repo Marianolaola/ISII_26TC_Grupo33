@@ -37,11 +37,11 @@ const procesarSolicitudExtraccion = async (req,res) => {
         const cuenta = validacionSaldo.cuenta;
 
         //Generamos Token Randomizado
-        const token = Math.floor(100000 + Math.random() * 900000).toString();
+        const token = OrdenExtraccion.generarToken();
 
         //Congelamos la plata y guardar la orden
         //Le pasamos el id_cuenta que se saca en la validacion anterior
-        await OrdenExtraccion.registrarOrdenDeExtracción(cuenta.id_cuenta, montoValidado,token);
+        await OrdenExtraccion.registrarOrdenDeExtraccion(cuenta.id_cuenta, montoValidado,token);
 
         //Enviamos el token para armar el comprobante en pantalla
 
@@ -86,7 +86,7 @@ const cancelarOrden = async (req, res) => {
     try {
         const { id_orden } = req.body;
         
-        await Cuenta.cancelarOrdenYDevolverPlata(id_orden);
+        await OrdenExtraccion.cancelarOrdenExtraccion(id_orden);
         
         res.json({ ok: true, mensaje: "Orden cancelada y dinero devuelto al saldo." });
     } catch (error) {
