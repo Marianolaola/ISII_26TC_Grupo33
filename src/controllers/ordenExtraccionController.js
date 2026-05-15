@@ -1,6 +1,7 @@
 const Cuenta = require('../models/Cuenta');
+const OrdenExtraccion = require('../models/OrdenExtraccion');
 
-const generarOrden = async (req,res) => {
+const generarOrdenExtraccion = async (req,res) => {
 
     const {id_cliente, monto} = req.body;
 
@@ -13,6 +14,18 @@ const generarOrden = async (req,res) => {
     try {
         console.log(`Llegó un pedido: Cliente ${id_cliente} quiere extraer $${monto}`);
         
+        // Validamos el monto de extracción
+        const validacionMonto = OrdenExtraccion.validarMontoExtraccion(monto);
+        
+        if (!validacionMonto.ok) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: validacionMonto.mensaje
+            });
+        }
+        
+        const montoValidado = validacionMonto.monto;
+
         // hablamos con el modelo Cuenta
         const cuenta = await Cuenta.obtenerCuentaPorCliente(id_cliente);
 
@@ -24,7 +37,7 @@ const generarOrden = async (req,res) => {
             });
         }
 
-        if (cuenta.saldo < monto) {
+        if (cuenta.saldo < montoValidado) {
             return res.status(400).json ({
                 ok: false,
                 mensaje: `Saldo insuficiente. Tu saldo actual es de $${cuenta.saldo}`
@@ -36,7 +49,7 @@ const generarOrden = async (req,res) => {
 
         //Congelamos la plata y guardar la orden
         //Le pasamos el id_cuenta que se saca en la validacion anterior
-        await Cuenta.registrarOrdenDeExtracción(cuenta.id_cuenta, monto,token);
+        await Cuenta.registrarOrdenDeExtracción(cuenta.id_cuenta, montoValidado,token);
 
         //Enviamos el token para armar el comprobante en pantalla
 
@@ -124,7 +137,7 @@ const cancelarOrden = async (req, res) => {
 };
 
 module.exports = {
-    generarOrden,
+    generarOrdenExtraccion,
     consultarSaldo,
     listarOrdenes,
     cancelarOrden

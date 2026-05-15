@@ -68,8 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Si no hay usuario, es dirigido al login
             if (!storage) return window.location.href = '/index.html';
             
-            //Se convierte a número
-            const saldoActual = parseFloat(storage.saldo);
 
             // Validaciones locales básicas
 
@@ -83,10 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            //2. Validación de saldo
-            if (montoAExtraer > saldoActual) {
-            return Swal.fire({ icon: 'error', title: 'Fondos insuficientes', text: `Tu saldo actual es de $${saldoActual}`});
-            }
 
             // --- CARTEL DE CONFIRMACIÓN ---
             const confirmacion = await Swal.fire({

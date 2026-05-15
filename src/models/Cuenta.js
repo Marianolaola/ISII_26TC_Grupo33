@@ -77,7 +77,7 @@ const obtenerOrdenesPorCliente = async (id_cliente) => {
          JOIN 
             estado_orden eo ON o.id_estado_orden = eo.id_estado_orden
          WHERE 
-            cu.id_usuario = ?
+            cu.id_cliente = ?
          ORDER BY o.fecha_generacion DESC`,
         [id_cliente]
     );
