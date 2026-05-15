@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (etiquetaNombre) etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
     
     // Sincronización inicial de saldo
-    sincronizarSaldoReal(usuario.id_usuario);
+    sincronizarSaldoReal(usuario.id_cliente);
     // Carga del historial de órdenes generadas
-    cargarHistorial(usuario.id_usuario);
+    cargarHistorial(usuario.id_cliente);
 
     // --- LÓGICA DEL MENÚ LATERAL
     //Basicamente guarda referencias a elementos HTML
@@ -107,14 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- FIN DEL CARTEL DE CONFIRMACIÓN ---
 
             try {
-                const resultado = await api.solicitarExtraccion(storage.id_usuario, montoAExtraer);
+                const resultado = await api.solicitarExtraccion(storage.id_cliente, montoAExtraer);
                 
                 if (resultado.ok) {
                     ui.mostrarResultadoExtraccion(resultado.datos.token, montoAExtraer);
                     
                     // REUTILIZACIÓN: Actualizamos el saldo pidiendo la verdad al servidor
-                    await sincronizarSaldoReal(storage.id_usuario);
-                    await cargarHistorial(storage.id_usuario);
+                    await sincronizarSaldoReal(storage.id_cliente);
+                    await cargarHistorial(storage.id_cliente);
                 }
             } catch (error) {
                 console.error("Motivo del error en extracción:", error);
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Recargamos el historial para ver el estado "Cancelada"
                     const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
-                    await cargarHistorial(storage.id_usuario);
+                    await cargarHistorial(storage.id_cliente);
                 }
             } catch (error) {
                 Swal.fire('Error', 'No se pudo cancelar la orden.', 'error');

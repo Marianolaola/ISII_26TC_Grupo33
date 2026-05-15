@@ -2,23 +2,25 @@ const Cuenta = require('../models/Cuenta');
 
 const generarOrden = async (req,res) => {
 
-    const {id_usuario, monto} = req.body;
+    const {id_cliente, monto} = req.body;
 
-    if (!id_usuario || !monto){
-        return res.status(400).json ({ok: false,
-                                      mensaje :  "Datos faltante/Inválidos!!"})
+    if (!id_cliente || !monto){
+        return res.status(400).json ({
+        ok: false,
+        mensaje :  "Datos faltante o inválidos"})
     }
+
     try {
-        console.log(`Llegó un pedido: Cliente ${id_usuario} quiere extraer $${monto}`);
+        console.log(`Llegó un pedido: Cliente ${id_cliente} quiere extraer $${monto}`);
         
         // hablamos con el modelo Cuenta
-        const cuenta = await Cuenta.obtenerCuentaPorUsuario(id_usuario);
+        const cuenta = await Cuenta.obtenerCuentaPorCliente(id_cliente);
 
         if(!cuenta) {
             return res.status(400).json ({
 
                 ok: false,
-                mensaje : "Error: El usuario no tiene cuenta bancaria asignada."
+                mensaje : "Error: El cliente no tiene cuenta bancaria asignada."
             });
         }
 
@@ -61,24 +63,28 @@ const generarOrden = async (req,res) => {
 const consultarSaldo = async (req,res) => {
     try{
         //Sacamos el ID wue viene en la URL
-        const id_usuario = req.params.id;
+        const id_cliente = req.params.id;
 
-        if (!id_usuario || isNaN(id_usuario))
+        if (!id_cliente || isNaN(id_cliente))
         {
-            return res.status(400).json ({ok: false, mensaje: "ID de usuario inválido"});
+            return res.status(400).json ({
+                ok: false, 
+                mensaje: "ID de cliente inválido"});
         }
         
         //Llamamos al modelo para buscar la cuenta
-        const cuentaUsuario = await Cuenta.obtenerCuentaPorUsuario(id_usuario);
+        const cuentaCliente = await Cuenta.obtenerCuentaPorCliente(id_cliente);
 
         // Verificamos si la cuenta existe antes de intentar acceder a su saldo
-        if (!cuentaUsuario) {
-            return res.status(404).json({ ok: false, mensaje: "Cuenta no encontrada" });
+        if (!cuentaCliente) {
+            return res.status(404).json({ 
+                ok: false, 
+                mensaje: "Cuenta no encontrada" });
         }
 
         res.json({
             ok: true,
-            saldo_real: cuentaUsuario.saldo
+            saldo_real: cuentaCliente.saldo
         });
     
     }catch (error){
@@ -90,9 +96,9 @@ const consultarSaldo = async (req,res) => {
 
 const listarOrdenes = async (req, res) => {
     try {
-        const id_usuario = req.params.id;
+        const id_cliente = req.params.id;
         // Llamamos al modelo para traer las órdenes
-        const ordenes = await Cuenta.obtenerOrdenesPorUsuario(id_usuario);
+        const ordenes = await Cuenta.obtenerOrdenesPorCliente(id_cliente);
         
         res.json({
             ok: true,

@@ -1,21 +1,22 @@
 const db = require('../config/db');
 
-const obtenerCuentaPorUsuario = async (id_usuario) =>
+const obtenerCuentaPorCliente = async (id_cliente) =>
 {
     const [cuentas] = await db.query(
-        `SELECT c.id_cuenta,
-                c.saldo,
-                c.saldo_inmovilizado
-        FROM cuenta c
-        JOIN usuario u ON c.id_cliente = u.id_cliente
-        WHERE u.id_usuario = ?`,
-        [id_usuario]
+        `SELECT 
+            id_cuenta,
+            saldo,
+            saldo_inmovilizado
+        FROM 
+            cuenta
+        WHERE 
+            id_cliente = ?`,
+        [id_cliente]
     );
 
     return cuentas.length > 0 ? cuentas[0] : null;
 
 }
-
 
 const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
 {
@@ -61,16 +62,24 @@ const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
     }
 };
 
-const obtenerOrdenesPorUsuario = async (id_usuario) => {
+const obtenerOrdenesPorCliente = async (id_cliente) => {
     const [ordenes] = await db.query(
-        `SELECT o.id_orden, o.monto, o.token, o.fecha_generacion, e.nombre as estado
-         FROM orden_extraccion o
-         JOIN cuenta c ON o.id_cuenta = c.id_cuenta
-         JOIN usuario u ON c.id_cliente = u.id_cliente
-         JOIN estado_orden e ON o.id_estado_orden = e.id_estado_orden
-         WHERE u.id_usuario = ?
+        `SELECT 
+            o.id_orden, 
+            o.token,
+            o.monto, 
+            o.fecha_generacion, 
+            eo.nombre AS estado
+         FROM 
+            orden_extraccion o
+         JOIN 
+            cuenta cu ON o.id_cuenta = cu.id_cuenta
+         JOIN 
+            estado_orden eo ON o.id_estado_orden = eo.id_estado_orden
+         WHERE 
+            cu.id_usuario = ?
          ORDER BY o.fecha_generacion DESC`,
-        [id_usuario]
+        [id_cliente]
     );
     return ordenes;
 };
@@ -122,8 +131,8 @@ const cancelarOrdenYDevolverPlata = async (id_orden) => {
 };
 
 module.exports = {
-    obtenerCuentaPorUsuario,
+    obtenerCuentaPorCliente,
     registrarOrdenDeExtracción,
-    obtenerOrdenesPorUsuario,
+    obtenerOrdenesPorCliente,
     cancelarOrdenYDevolverPlata
 };
