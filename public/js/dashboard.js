@@ -112,7 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error("Motivo del error en extracción:", error);
-                Swal.fire({ icon: 'warning', title: 'Error de conexión :/', text: 'Intente de nuevo más tarde' });
+                Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'No se pudo generar la orden', 
+                    text: error.message || 'Revisá los datos ingresados e intentá nuevamente',
+                    confirmButtonColor: '#0b5ed7' });
             }
         });
     }
@@ -157,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Recargamos el historial para ver el estado "Cancelada"
                     const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
                     await cargarHistorial(storage.id_cliente);
+                    await sincronizarSaldoReal(storage.id_cliente);
                 }
             } catch (error) {
                 Swal.fire('Error', 'No se pudo cancelar la orden.', 'error');

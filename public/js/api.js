@@ -21,11 +21,13 @@ export async function solicitarExtraccion(idCliente, monto) {
         body: JSON.stringify({ id_cliente: idCliente, monto: monto })
     });
 
+    const datos = await respuesta.json();
+
     if (!respuesta.ok) {
-        throw new Error("Error en la solicitud de extracción");
+        throw new Error(datos.mensaje || "No se pudo generar la orden de extracción.");
     }
 
-    return await respuesta.json();
+    return datos;
 }
 
 export async function obtenerHistorialOrdenes(idCliente) {
