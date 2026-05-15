@@ -3,7 +3,7 @@ const router = express.Router();
 const ordenExtraccionController = require ('../controllers/ordenExtraccionController');
 
 
-router.post('/generar-extraccion', ordenExtraccionController.generarOrdenExtraccion);
+router.post('/generar-extraccion', ordenExtraccionController.procesarSolicitudExtraccion);
 router.get('/saldo/:id', ordenExtraccionController.consultarSaldo);
 router.get('/ordenes/:id', ordenExtraccionController.listarOrdenes);
 router.post('/cancelar-orden', ordenExtraccionController.cancelarOrden);

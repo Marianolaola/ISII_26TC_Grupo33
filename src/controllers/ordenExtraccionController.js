@@ -1,7 +1,7 @@
 const Cuenta = require('../models/Cuenta');
 const OrdenExtraccion = require('../models/OrdenExtraccion');
 
-const generarOrdenExtraccion = async (req,res) => {
+const procesarSolicitudExtraccion = async (req,res) => {
 
     const {id_cliente, monto} = req.body;
 
@@ -23,26 +23,18 @@ const generarOrdenExtraccion = async (req,res) => {
                 mensaje: validacionMonto.mensaje
             });
         }
-        
         const montoValidado = validacionMonto.monto;
 
-        // hablamos con el modelo Cuenta
-        const cuenta = await Cuenta.obtenerCuentaPorCliente(id_cliente);
 
-        if(!cuenta) {
-            return res.status(400).json ({
+        const validacionSaldo = await Cuenta.verificarSaldoDisponible(id_cliente, montoValidado);
 
+        if (!validacionSaldo.ok) {
+            return res.status(400).json({
                 ok: false,
-                mensaje : "Error: El cliente no tiene cuenta bancaria asignada."
+                mensaje: validacionSaldo.mensaje
             });
         }
-
-        if (cuenta.saldo < montoValidado) {
-            return res.status(400).json ({
-                ok: false,
-                mensaje: `Saldo insuficiente. Tu saldo actual es de $${cuenta.saldo}`
-            });
-        }
+        const cuenta = validacionSaldo.cuenta;
 
         //Generamos Token Randomizado
         const token = Math.floor(100000 + Math.random() * 900000).toString();
@@ -58,8 +50,8 @@ const generarOrdenExtraccion = async (req,res) => {
             mensaje: "¡Hay fondos suficientes Extraccion generada con Éxito :)",
             datos: {
                 token: token,
-                monto_solicitado : monto,
-                saldo_restante: cuenta.saldo - monto
+                monto_solicitado : montoValidado,
+                saldo_restante: cuenta.saldo - montoValidado
             }
         });
 
@@ -137,7 +129,7 @@ const cancelarOrden = async (req, res) => {
 };
 
 module.exports = {
-    generarOrdenExtraccion,
+    procesarSolicitudExtraccion,
     consultarSaldo,
     listarOrdenes,
     cancelarOrden

@@ -18,6 +18,40 @@ const obtenerCuentaPorCliente = async (id_cliente) =>
 
 }
 
+
+//PASO 4 CONVERSACION
+const verificarSaldoDisponible = async (id_cliente, monto) => {
+    const cuenta = await obtenerCuentaPorCliente(id_cliente);
+
+    if (!cuenta) {
+        return {
+            ok: false,
+            mensaje: "El cliente no tiene cuenta bancaria asignada."
+        };
+    }
+
+    if (cuenta.saldo < monto) {
+        return {
+            ok: false,
+            mensaje: `Saldo insuficiente. Tu saldo actual es de $${cuenta.saldo}`,
+            cuenta
+        };
+    }
+
+    return {
+        ok: true,
+        cuenta
+    };
+};
+
+
+
+const consultarSaldo = async (id_cliente) => {
+    const cuenta = await obtenerCuentaPorCliente(id_cliente);
+    return cuenta ? cuenta.saldo : null;
+};
+
+
 const registrarOrdenDeExtracción = async (id_cuenta, monto, token) =>
 {
     //Pedimos exclusividad para hacer la Transacción al 100%
@@ -132,6 +166,8 @@ const cancelarOrdenYDevolverPlata = async (id_orden) => {
 
 module.exports = {
     obtenerCuentaPorCliente,
+    verificarSaldoDisponible,
+    consultarSaldo,
     registrarOrdenDeExtracción,
     obtenerOrdenesPorCliente,
     cancelarOrdenYDevolverPlata
