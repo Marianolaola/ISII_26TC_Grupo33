@@ -179,13 +179,6 @@ async function sincronizarSaldoReal(id) {
         if (datos.ok) {
             const saldo = parseFloat(datos.saldo_real);
             ui.actualizarSaldoVisual(saldo);
-            
-            // Actualizamos la mochila del LocalStorage de forma segura
-            const usuario = JSON.parse(localStorage.getItem('usuarioBancario'));
-            if (usuario) {
-                usuario.saldo = saldo;
-                localStorage.setItem('usuarioBancario', JSON.stringify(usuario));
-            }
         }
     } catch (err) {
         console.error("Fallo al sincronizar saldo:", err);

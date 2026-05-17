@@ -18,7 +18,6 @@ const obtenerCuentaPorCliente = async (id_cliente) =>
 
 }
 
-
 //PASO 4 CONVERSACION
 const verificarSaldoDisponible = async (id_cliente, monto) => {
     const cuenta = await obtenerCuentaPorCliente(id_cliente);
@@ -44,17 +43,24 @@ const verificarSaldoDisponible = async (id_cliente, monto) => {
     };
 };
 
-
-
 const consultarSaldo = async (id_cliente) => {
     const cuenta = await obtenerCuentaPorCliente(id_cliente);
     return cuenta ? cuenta.saldo : null;
 };
 
+const devolverSaldoInmovilizado = async (id_cuenta,monto,conexion) => {
+    await conexion.query(
+        `UPDATE cuenta
+         SET saldo = saldo + ?, saldo_inmovilizado = saldo_inmovilizado - ?
+         WHERE id_cuenta = ?`,
+         [monto,monto,id_cuenta]
+    )
+};
 
 
 module.exports = {
     obtenerCuentaPorCliente,
     verificarSaldoDisponible,
+    devolverSaldoInmovilizado,
     consultarSaldo
 };
