@@ -61,7 +61,7 @@ const cancelarOrden = async (req, res) => {
         console.error("Error al cancelar:", error);
         res.status(400).json({ 
             ok: false, 
-            mensaje: error.mensaje ||"No se pudo cancelar la orden." 
+            mensaje: error.message ||"No se pudo cancelar la orden." 
         });
     }
 };
