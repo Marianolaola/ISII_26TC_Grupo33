@@ -28,7 +28,14 @@ const login = async (req, res) => {
         //Caso del login correcto
         res.json ({
             mensaje: '✅ ¡Bienvenido al sistema!',
-            usuario: usuarioLogueado
+            usuario: {
+                id_usuario: usuarioLogueado.id_usuario,
+                id_cliente: usuarioLogueado.id_cliente,
+                nombre: usuarioLogueado.nombre,
+                apellido: usuarioLogueado.apellido,
+                email: usuarioLogueado.email,
+                id_tipo_rol: usuarioLogueado.id_tipo_rol
+            }
         });
 
     }catch (error) {

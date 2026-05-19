@@ -50,8 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         confirmButtonColor: '#0b5ed7'
                     });
 
+                    const usuarioSesion = {
+                        id_usuario: datos.usuario.id_usuario,
+                        id_cliente: datos.usuario.id_cliente,
+                        nombre: datos.usuario.nombre,
+                        apellido: datos.usuario.apellido,
+                        email: datos.usuario.email,
+                        id_tipo_rol: datos.usuario.id_tipo_rol
+                    }
+
                     // Guardamos el usuario en el Local Storage para usarlo en otras páginas
-                    localStorage.setItem('usuarioBancario', JSON.stringify(datos.usuario));
+                    localStorage.setItem('usuarioBancario', JSON.stringify(usuarioSesion));
 
                     
                     // Acá lo mandamos a la siguiente pantalla

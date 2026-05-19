@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (etiquetaNombre) etiquetaNombre.innerText = `${usuario.nombre} ${usuario.apellido}`;
     
     // Sincronización inicial de saldo
-    sincronizarSaldoReal(usuario.id_usuario);
+    sincronizarSaldoReal(usuario.id_cliente);
     // Carga del historial de órdenes generadas
-    cargarHistorial(usuario.id_usuario);
+    cargarHistorial(usuario.id_cliente);
 
     // --- LÓGICA DEL MENÚ LATERAL
     //Basicamente guarda referencias a elementos HTML
@@ -68,8 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Si no hay usuario, es dirigido al login
             if (!storage) return window.location.href = '/index.html';
             
-            //Se convierte a número
-            const saldoActual = parseFloat(storage.saldo);
 
             // Validaciones locales básicas
 
@@ -83,10 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            //2. Validación de saldo
-            if (montoAExtraer > saldoActual) {
-            return Swal.fire({ icon: 'error', title: 'Fondos insuficientes', text: `Tu saldo actual es de $${saldoActual}`});
-            }
 
             // --- CARTEL DE CONFIRMACIÓN ---
             const confirmacion = await Swal.fire({
@@ -107,18 +101,22 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- FIN DEL CARTEL DE CONFIRMACIÓN ---
 
             try {
-                const resultado = await api.solicitarExtraccion(storage.id_usuario, montoAExtraer);
+                const resultado = await api.solicitarExtraccion(storage.id_cliente, montoAExtraer);
                 
                 if (resultado.ok) {
                     ui.mostrarResultadoExtraccion(resultado.datos.token, montoAExtraer);
                     
                     // REUTILIZACIÓN: Actualizamos el saldo pidiendo la verdad al servidor
-                    await sincronizarSaldoReal(storage.id_usuario);
-                    await cargarHistorial(storage.id_usuario);
+                    await sincronizarSaldoReal(storage.id_cliente);
+                    await cargarHistorial(storage.id_cliente);
                 }
             } catch (error) {
                 console.error("Motivo del error en extracción:", error);
-                Swal.fire({ icon: 'warning', title: 'Error de conexión :/', text: 'Intente de nuevo más tarde' });
+                Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'No se pudo generar la orden', 
+                    text: error.message || 'Revisá los datos ingresados e intentá nuevamente',
+                    confirmButtonColor: '#0b5ed7' });
             }
         });
     }
@@ -162,7 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Recargamos el historial para ver el estado "Cancelada"
                     const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
-                    await cargarHistorial(storage.id_usuario);
+                    await cargarHistorial(storage.id_cliente);
+                    await sincronizarSaldoReal(storage.id_cliente);
                 }
             } catch (error) {
                 Swal.fire('Error', 'No se pudo cancelar la orden.', 'error');
@@ -180,13 +179,6 @@ async function sincronizarSaldoReal(id) {
         if (datos.ok) {
             const saldo = parseFloat(datos.saldo_real);
             ui.actualizarSaldoVisual(saldo);
-            
-            // Actualizamos la mochila del LocalStorage de forma segura
-            const usuario = JSON.parse(localStorage.getItem('usuarioBancario'));
-            if (usuario) {
-                usuario.saldo = saldo;
-                localStorage.setItem('usuarioBancario', JSON.stringify(usuario));
-            }
         }
     } catch (err) {
         console.error("Fallo al sincronizar saldo:", err);
