@@ -34,7 +34,7 @@ const realizarTransferencia = async (req, res) => {
 
         res.status(400).json({
             ok: false,
-            mensaje: error.mensaje || "Ocurrió un error, no se pudo realizar la transferencia."
+            mensaje: error.message || "Ocurrió un error, no se pudo realizar la transferencia."
         });
     }
 

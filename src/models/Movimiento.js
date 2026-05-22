@@ -31,7 +31,7 @@ const validarConceptoMovimiento = async (id_concepto_movimiento) => {
         [id_concepto_movimiento]
     );
 
-    if (concepto.length === 0) {
+    if (conceptos.length === 0) {
         return {
             ok: false, 
             mensaje: "El concepto selecciona no es válido."
