@@ -1,24 +1,32 @@
-// 1. Importaciones (Traemos las herramientas)
+// 1. Importaciones herramientas
 const express = require('express');
 const cors = require('cors');
-const db = require('./config/db'); // Traemos el puente a la base de datos
-require('dotenv').config();        // Activamos las variables del .env
+const db = require('./config/db'); 
+require('dotenv').config();        
 
 const authRoutes = require ('./routes/authRoutes');
 const extraccionRouters = require ('./routes/extraccionRoutes');
+const transferenciaRoutes = require ('./routes/transferenciaRoutes');
+
+
 // 2. Inicialización
+
 const app = express();
 
-// 3. Middlewares (Los "Traductores" y "Porteros")
-app.use(cors());           // Permiso para que Matías se conecte desde su puerto
-app.use(express.json());   // Traductor para entender los datos que mande el Front
-app.use(express.static('public')); // Configuración para que Node muestre el HTML de la carpeta "public"
+// 3. Middlewares 
+
+app.use(cors());           
+app.use(express.json());   
+app.use(express.static('public')); 
 
 //Decimeos a la app que use las rutas de acá
+
 app.use('/api', authRoutes);
 app.use('/api', extraccionRouters);
+app.use('/api', transferenciaRoutes);
 
 // 4. Ruta de prueba (Para saber si todo el cableado funciona)
+
 app.get('/probar-conexion', async (req, res) => {
     try {
         // Le pedimos a la DB que nos diga la hora actual
