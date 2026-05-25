@@ -53,3 +53,35 @@ export async function cancelarOrdenApi(idOrden) {
         
     return await respuesta.json();
 }
+
+
+// FUNCIONALIDAD 2 - TRANSFERENCIAS ------------------------------------------------------------------
+
+
+export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, idConceptoMovimiento) {
+    
+    const respuesta = await fetch('/api/transferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            id_cliente: idCliente,
+            cbuAliasDestino,
+            monto,
+            id_concepto_movimiento: idConceptoMovimiento
+        })
+    });
+
+    const datos = await respuesta.json();
+
+    if(!respuesta.ok) {
+        throw new Error(datos.mensaje || "No se pudo realizar la trasnferencia.");   
+    }
+
+    return datos;
+
+
+
+}
+
+
+

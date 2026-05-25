@@ -34,8 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DEL MENÚ LATERAL
     //Basicamente guarda referencias a elementos HTML
     const linkExtracciones = document.getElementById('link-extracciones');
+    const linkTransferencias = document.getElementById('link-transferencias');
+
+
     const pantallaInicio = document.getElementById('pantalla-inicio');
     const pantallaExtraccion = document.getElementById('pantalla-extraccion');
+    const pantallaTransferencia = document.getElementById('pantalla-transferencia');
+
+
 
     if (linkExtracciones) {
         linkExtracciones.addEventListener('click', (e) => {
@@ -48,7 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ocultamos el mensaje de bienvenida y mostramos el formulario
             if (pantallaInicio) pantallaInicio.classList.add('d-none');
             if (pantallaExtraccion) pantallaExtraccion.classList.remove('d-none');
+            if (pantallaTransferencia) pantallaTransferencia.classList.add('d-none');
         });
+    }
+
+    if (linkTransferencias) {
+        linkTransferencias.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('activo'));
+            linkTransferencias.classList.add('activo');
+
+            if(pantallaInicio) pantallaInicio.classList.add('d-none');
+            if(pantallaExtraccion) pantallaExtraccion.classList.add('d-none');
+            if(pantallaTransferencia) pantallaTransferencia.classList.remove('d-none');
+        })
     }
 
     // LÓGICA DE EXTRACCIÓN
@@ -121,6 +141,92 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // LOGICA DE TRANSFERENCIA
+
+    const formTransferencia = document.getElementById('form-transferencia');
+
+    if (formTransferencia) {
+        formTransferencia.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
+
+            if (!storage) {
+                return window.location.href = '/index.html';
+            }
+
+            const cbuAliasDestino = document.getElementById('destino-transferencia').value.trim();
+            const montoTransferencia = parseFloat(document.getElementById('monto-transferencia').value);
+            const idConceptoMovimiento = parseInt(document.getElementById('concepto-transferencia').value);
+
+            if (!cbuAliasDestino || !montoTransferencia || !idConceptoMovimiento) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Datos incompletos',
+                    text: 'Por favor, completá todos los campos para realizar la transferencia.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+
+            if(montoTransferencia <= 0) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Monto inválido',
+                    text: 'El monto debe ser mayor a cero.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+
+            const confirmacion = await Swal.fire({
+                title: 'Confirmar Transferencia',
+                text: `¿Confirmás transferir $${montoTransferencia.toLocaleString('es-AR')} a ${cbuAliasDestino}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0b5ed7',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            });
+
+
+            if(!confirmacion.isConfirmed) {
+                return;
+            }
+
+            try{
+                const resultado = await api.realizarTransferencia(
+                    storage.id_cliente,
+                    cbuAliasDestino,
+                    montoTransferencia,
+                    idConceptoMovimiento
+                );
+
+                if(resultado.ok) {
+                    mostrarResultadoTransferencia(resultado.datos);
+
+                    await sincronizarSaldoReal(storage.id_cliente);
+                    
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Transferencia realizada con éxito',
+                        text: resultado.mensaje,
+                        confirmButtonColor: '#0b5ed7'
+                    });
+                }
+
+            }catch (error) {
+                console.error("Error en la transferencia:", error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo realizar la transferencia',
+                    text: error.message || 'Revisá los datos ingresados e intentá nuevamente.',
+                    confirmButtonColor: '#0b5ed7'
+                })
+            }
+        });
+    }
+
     // Función auxiliar
     async function cargarHistorial(id) {
         try {
@@ -131,12 +237,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function mostrarResultadoTransferencia(datos){
+        const formTransferencia = document.getElementById('form-transferencia');
+        const resultadoTransferencia = document.getElementById('resultado-transferencia');
+
+        if (formTransferencia) formTransferencia.classList.add('d-none');
+        if (resultadoTransferencia) resultadoTransferencia.classList.remove('d-none');
+
+        const destino = datos.alias_destino || datos.cbu_destino || '---';
+
+        document.getElementById('transferencia-destino').innerText = destino;
+        doucment.getElementById('transferencia-monto').innerText = new Intl.NumberFormat('es-AR', {
+            syle: 'currency',
+            currency: 'ARS'
+        }).format(datos.monto);
+
+        document.getElementById('transferencia-concepto').innerText = datos.concepto || '---';
+        
+        document.getElementById('transferencia-fecha').innerText = new Date().toLocaleDateString('es-AR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+    }
+
     const btnDescargarPdf = document.getElementById('btn-descargar-pdf');
     if (btnDescargarPdf) {
-    btnDescargarPdf.addEventListener('click', () => {
-        // Solo llamamos a la función indicando qué queremos imprimir
-        descargarComprobantePDF('comprobante-imprimir');
-    });
+        btnDescargarPdf.addEventListener('click', () => {
+            // Solo llamamos a la función indicando qué queremos imprimir
+            descargarComprobantePDF('comprobante-imprimir');
+        });
+    }
+
+    const btnDescargarTransferencia = document.getElementById('btn-descargar-transferencia-pdf');
+    if(btnDescargarTransferencia) {
+        btnDescargarTransferencia.addEventListener('click', () => {
+            descargarComprobantePDF('comprobante-transferencia-imprimir');
+        });
     }
 
     // --- LÓGICA DE CANCELACIÓN DE ORDEN (BAJA LÓGICA) ---

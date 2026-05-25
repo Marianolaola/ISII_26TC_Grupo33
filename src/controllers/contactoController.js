@@ -7,7 +7,7 @@ const agendarContacto = async (req, res) => {
         if (!id_cliente || !cbu_destinatario || !nombre_contacto) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "Datos faltante para agendar el contacto."
+                mensaje: "Datos faltantes para agendar el contacto."
             });
         }
 
@@ -28,7 +28,7 @@ const agendarContacto = async (req, res) => {
 
         res.status(500).json({
             ok: false,
-            mensaje: error.menssage || "No se pudo agendar el contacto."
+            mensaje: error.message || "No se pudo agendar el contacto."
         })
     }
 };
