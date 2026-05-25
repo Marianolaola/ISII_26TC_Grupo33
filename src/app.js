@@ -7,7 +7,7 @@ require('dotenv').config();
 const authRoutes = require ('./routes/authRoutes');
 const extraccionRouters = require ('./routes/extraccionRoutes');
 const transferenciaRoutes = require ('./routes/transferenciaRoutes');
-
+const contactoRoutes = require('./routes/contactoRoutes');
 
 // 2. Inicialización
 
@@ -17,13 +17,14 @@ const app = express();
 
 app.use(cors());           
 app.use(express.json());   
-app.use(express.static('public')); 
+app.use(express.static('public'));
 
 //Decimeos a la app que use las rutas de acá
 
 app.use('/api', authRoutes);
 app.use('/api', extraccionRouters);
 app.use('/api', transferenciaRoutes);
+app.use('/api', contactoRoutes);
 
 // 4. Ruta de prueba (Para saber si todo el cableado funciona)
 
