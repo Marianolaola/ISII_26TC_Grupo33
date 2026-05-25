@@ -74,13 +74,45 @@ export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, i
     const datos = await respuesta.json();
 
     if(!respuesta.ok) {
-        throw new Error(datos.mensaje || "No se pudo realizar la trasnferencia.");   
+        throw new Error(datos.mensaje || "No se pudo realizar la transferencia.");   
     }
 
     return datos;
 
+}
 
+// CONTACTOS -------------------------------------------------------------------------------------------
 
+export async function agendarContacto(idCliente, cbuDestinatario, nombreContacto) {
+    const respuesta = await fetch('/api/contactos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id_cliente: idCliente,
+            cbu_destinatario: cbuDestinatario,
+            nombre_contacto: nombreContacto
+        })
+    });
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+        throw new Error(datos.mensaje || "No se pudo agendar el contacto.");
+    }
+
+    return datos;
+}
+
+export async function obtenerContactos(idCliente) {
+    const respuesta = await fetch(`/api/clientes/${idCliente}/contactos`);
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+        throw new Error(datos.mensaje || "No se pudieron obtener los contactos.");
+    }
+
+    return datos;
 }
 
 

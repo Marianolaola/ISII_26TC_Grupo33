@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }//Si existe lo convierte a objeto Java
     const usuario = JSON.parse(datosRaw);
 
+    let ultimaTransferenciaRealizada = null; // Variable para almacenar la última transferencia realizada
+
 
     // RENDERIZADO INICIAL
     //Busca el elemento de HTML con id nombre-usuario
@@ -68,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if(pantallaInicio) pantallaInicio.classList.add('d-none');
             if(pantallaExtraccion) pantallaExtraccion.classList.add('d-none');
             if(pantallaTransferencia) pantallaTransferencia.classList.remove('d-none');
+
+            await cargarContactosTransferencia(usuario.id_cliente);
         })
     }
 
@@ -237,7 +241,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function cargarContactosTransferencia(idCliente) {
+        const selectContactos = document.getElementById('contacto-transferencia');
+
+        if (!selectContactos) return;
+
+        try {
+            const datos = await api.obtenerContactos(idCliente);
+
+            selectContactos.innerHTML = '<option value="">Seleccionar contacto agendado</option>';
+
+            if (!datos.contactos || datos.contactos.length === 0) {
+                return;
+            }
+
+            datos.contactos.forEach(contacto => {
+                const option = document.createElement('option');
+                option.value = contacto.cbu_destinatario;
+                option.textContent = `${contacto.nombre_contacto} - ${contacto.cbu_destinatario}`;
+                selectContactos.appendChild(option);
+            });
+
+        } catch (error) {
+            console.error("Error al cargar contactos:", error);
+        }
+    }
+
+    const selectContactoTransferencia = document.getElementById('contacto-transferencia');
+
+    if (selectContactoTransferencia) {
+        selectContactoTransferencia.addEventListener('change', () => {
+            const destinoInput = document.getElementById('destino-transferencia');
+
+            if (!destinoInput) return;
+
+            destinoInput.value = selectContactoTransferencia.value;
+        });
+    }
+
+
     function mostrarResultadoTransferencia(datos){
+
+        ultimaTransferenciaRealizada = datos; 
+
         const formTransferencia = document.getElementById('form-transferencia');
         const resultadoTransferencia = document.getElementById('resultado-transferencia');
 
@@ -247,8 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const destino = datos.alias_destino || datos.cbu_destino || '---';
 
         document.getElementById('transferencia-destino').innerText = destino;
-        doucment.getElementById('transferencia-monto').innerText = new Intl.NumberFormat('es-AR', {
-            syle: 'currency',
+        document.getElementById('transferencia-monto').innerText = new Intl.NumberFormat('es-AR', {
+            style: 'currency',
             currency: 'ARS'
         }).format(datos.monto);
 
@@ -275,6 +321,80 @@ document.addEventListener('DOMContentLoaded', () => {
             descargarComprobantePDF('comprobante-transferencia-imprimir');
         });
     }
+
+    const btnAgendarContacto = document.getElementById('btn-agendar-contacto');
+
+    if (btnAgendarContacto) {
+        btnAgendarContacto.addEventListener('click', async () => {
+            const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
+
+            if (!storage) {
+                return window.location.href = '/index.html';
+            }
+
+            if (!ultimaTransferenciaRealizada) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'No hay transferencia',
+                    text: 'Primero realizá una transferencia para poder agendar el destinatario.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+
+            const cbuDestinatario = ultimaTransferenciaRealizada.cbu_destino;
+            const aliasDestinatario = ultimaTransferenciaRealizada.alias_destino;
+
+            const respuesta = await Swal.fire({
+                title: 'Agendar destinatario',
+                input: 'text',
+                inputLabel: 'Nombre del contacto',
+                inputPlaceholder: 'Ej: Matías',
+                inputValue: aliasDestinatario || '',
+                showCancelButton: true,
+                confirmButtonText: 'Agendar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                inputValidator: (valor) => {
+                    if (!valor || valor.trim() === '') {
+                        return 'Ingresá un nombre para el contacto.';
+                    }
+                }
+            });
+
+            if (!respuesta.isConfirmed) {
+                return;
+            }
+
+            try {
+                const resultado = await api.agendarContacto(
+                    storage.id_cliente,
+                    cbuDestinatario,
+                    respuesta.value.trim()
+                );
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Contacto agendado',
+                    text: resultado.mensaje,
+                    confirmButtonColor: '#198754'
+                });
+
+                btnAgendarContacto.disabled = true;
+                btnAgendarContacto.innerText = 'Destinatario agendado';
+
+            } catch (error) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No se pudo agendar',
+                    text: error.message || 'El contacto no pudo ser agendado.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+        });
+    }
+
+
 
     // --- LÓGICA DE CANCELACIÓN DE ORDEN (BAJA LÓGICA) ---
     window.cancelarOrden = async (idOrden) => {
