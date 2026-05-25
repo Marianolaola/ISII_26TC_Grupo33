@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (linkTransferencias) {
-        linkTransferencias.addEventListener('click', (e) => {
+        linkTransferencias.addEventListener('click', async (e) => {
             e.preventDefault();
 
             document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('activo'));
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(pantallaTransferencia) pantallaTransferencia.classList.remove('d-none');
 
             await cargarContactosTransferencia(usuario.id_cliente);
-        })
+        });
     }
 
     // LÓGICA DE EXTRACCIÓN
