@@ -57,6 +57,18 @@ export async function cancelarOrdenApi(idOrden) {
 
 // FUNCIONALIDAD 2 - TRANSFERENCIAS ------------------------------------------------------------------
 
+export async function verificarDestinoTransferencia(cbuAliasDestino) {
+    const respuesta = await fetch(`/api/transferencia/destino/${encodeURIComponent(cbuAliasDestino)}`);
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+        throw new Error(datos.mensaje || "No se pudo verificar la cuenta destino.");
+    }
+
+    return datos;
+}
+
 
 export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, idConceptoMovimiento) {
     

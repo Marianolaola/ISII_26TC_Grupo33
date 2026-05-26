@@ -181,9 +181,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
+            let datosDestino;
+
+            try {
+                const respuestaDestino = await api.verificarDestinoTransferencia(cbuAliasDestino);
+                datosDestino = respuestaDestino.cuentaDestino;
+            } catch (error) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Destino inválido',
+                    text: error.message || 'No se pudo verificar la cuenta destino.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+
+            const nombreDestino = `${datosDestino.nombre} ${datosDestino.apellido}`;
+
             const confirmacion = await Swal.fire({
                 title: 'Confirmar Transferencia',
-                text: `¿Confirmás transferir $${montoTransferencia.toLocaleString('es-AR')} a ${cbuAliasDestino}?`,
+                html: `
+                    <p>¿Confirmás transferir <strong>$${montoTransferencia.toLocaleString('es-AR')}</strong> a:</p>
+                    <p class="mb-1"><strong>${nombreDestino}</strong></p>
+                    <p class="text-muted small mb-0">${datosDestino.alias || datosDestino.cbu}</p>
+                `,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#0b5ed7',
@@ -206,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 );
 
                 if(resultado.ok) {
-                    mostrarResultadoTransferencia(resultado.datos);
+                    await mostrarResultadoTransferencia(resultado.datos);
 
                     await sincronizarSaldoReal(storage.id_cliente);
                     
@@ -280,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function mostrarResultadoTransferencia(datos){
+    async function mostrarResultadoTransferencia(datos){
 
         ultimaTransferenciaRealizada = datos; 
 
@@ -304,6 +324,30 @@ document.addEventListener('DOMContentLoaded', () => {
             hour: '2-digit',
             minute: '2-digit'
         });
+
+        const storage = JSON.parse(localStorage.getItem('usuarioBancario'));
+        const btnAgendarContacto = document.getElementById('btn-agendar-contacto');
+
+        if (btnAgendarContacto && storage) {
+            try {
+                const respuestaContactos = await api.obtenerContactos(storage.id_cliente);
+
+                const yaExiste = respuestaContactos.contactos.some(contacto =>
+                    contacto.cbu_destinatario === datos.cbu_destino
+                );
+
+                if (yaExiste) {
+                    btnAgendarContacto.classList.add('d-none');
+                } else {
+                    btnAgendarContacto.classList.remove('d-none');
+                    btnAgendarContacto.disabled = false;
+                    btnAgendarContacto.innerText = 'Agendar contacto';
+                }
+
+            } catch (error) {
+                console.error("No se pudo verificar si el contacto ya existe:", error);
+            }
+        }
         
     }
 

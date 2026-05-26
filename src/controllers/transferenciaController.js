@@ -1,5 +1,5 @@
 const transferenciaService = require ('../services/transferenciaService');
-
+const Cuenta = require('../models/Cuenta');
 const realizarTransferencia = async (req, res) => {
     try {
         const {
@@ -40,6 +40,41 @@ const realizarTransferencia = async (req, res) => {
 
 };
 
+
+const verificarDestinoTransferencia = async (req, res) => {
+    try {
+        const { cbuAliasDestino } = req.params;
+
+        if (!cbuAliasDestino) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "Debe ingresar un CBU o alias destino."
+            });
+        }
+
+        const resultado = await Cuenta.verificarCuentaDestino(cbuAliasDestino);
+
+        if (!resultado.ok) {
+            return res.status(400).json(resultado);
+        }
+
+        res.json({
+            ok: true,
+            cuentaDestino: resultado.cuentaDestino
+        });
+
+    } catch (error) {
+        console.error("Error al verificar destino:", error);
+
+        res.status(500).json({
+            ok: false,
+            mensaje: "No se pudo verificar la cuenta destino."
+        });
+    }
+};
+
+
 module.exports = {
-    realizarTransferencia
+    realizarTransferencia,
+    verificarDestinoTransferencia
 };

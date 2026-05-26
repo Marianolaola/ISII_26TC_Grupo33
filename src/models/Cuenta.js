@@ -61,14 +61,17 @@ const devolverSaldoInmovilizado = async (id_cuenta,monto,conexion) => {
 const verificarCuentaDestino = async (cbuAliasDestino) => {
     const [cuentas] = await db.query(
         `SELECT
-            id_cuenta,
-            id_cliente,
-            cbu,
-            alias,
-            saldo,
-            saldo_inmovilizado
-            FROM cuenta
-            WHERE cbu = ? OR alias = ?`,
+            cu.id_cuenta,
+            cu.id_cliente,
+            cu.cbu,
+            cu.alias,
+            cu.saldo,
+            cu.saldo_inmovilizado,
+            cl.nombre,
+            cl.apellido
+            FROM cuenta cu
+            JOIN cliente cl ON cu.id_cliente = cl.id_cliente
+            WHERE cu.cbu = ? OR cu.alias = ?`,
             [cbuAliasDestino, cbuAliasDestino]
     );
 
