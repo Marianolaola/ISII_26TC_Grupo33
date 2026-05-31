@@ -104,6 +104,17 @@ export async function obtenerConceptosTransferencia() {
     return datos.conceptos;
 }
 
+export async function obtenerHistorialTransferencias(idCliente) {
+    const respuesta = await fetch(`/api/clientes/${idCliente}/transferencias`);
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+        throw new Error(datos.mensaje || "Error al cargar las transferencias");
+    }
+
+    return datos;
+}
+
 // CONTACTOS -------------------------------------------------------------------------------------------
 
 export async function agendarContacto(idCliente, cbuDestinatario, nombreContacto) {

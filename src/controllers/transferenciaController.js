@@ -90,8 +90,32 @@ const obtenerConceptos = async (req, res) => {
     }
 };
 
+const obtenerHistorialTransferencias = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Buscamos la cuenta usando la función que ya teníamos en el modelo de Cuenta
+        const cuenta = await Cuenta.obtenerCuentaPorCliente(id);
+        if (!cuenta) {
+            return res.status(404).json({ ok: false, mensaje: "Cuenta no encontrada." });
+        }
+        
+        const movimientos = await Movimiento.obtenerTransferenciasPorCuenta(cuenta.id_cuenta);
+        
+        res.json({
+            ok: true,
+            id_cuenta_propia: cuenta.id_cuenta, // Mandamos esto para saber si la plata entró o salió
+            movimientos
+        });
+    } catch (error) {
+        console.error("Error al obtener el historial de transferencias:", error);
+        res.status(500).json({ ok: false, mensaje: "No se pudo cargar el historial." });
+    }
+};
+
 module.exports = {
     realizarTransferencia,
     verificarDestinoTransferencia,
-    obtenerConceptos
+    obtenerConceptos,
+    obtenerHistorialTransferencias
 };
