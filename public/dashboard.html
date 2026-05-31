@@ -28,7 +28,7 @@
                     
                     <a href="#" id="link-extracciones" class="menu-link">💸 Extracciones</a>
                     
-                    <a href="#" class="menu-link" onclick="alert('Funcionalidad en desarrollo')">🔁 Transferencias</a>
+                    <a href="#" id="link-transferencias" class="menu-link">🔁 Transferencias</a>
                 </div>
             </div>
 
@@ -96,6 +96,119 @@
                             </div>
                         </div>
                         
+                    </div>
+                </div>
+
+                <div id="pantalla-transferencia" class="card shadow-sm border-0 d-none">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-banco mb-3 border-bottom pb-2">
+                            Realizar Transferencia
+                        </h5>
+
+                        <p class="text-muted small mb-4">
+                            Ingresá el CBU o alias del destinatario, el monto a transferir y seleccioná un concepto.
+                        </p>
+
+                        <form id="form-transferencia">
+                            <div class="mb-3">
+                                <label for="contacto-transferencia" class="form-label fw-bold">
+                                    Contacto agendado
+                                </label>
+
+                                <select id="contacto-transferencia" class="form-select form-select-lg bg-light">
+                                    <option value="">Seleccionar contacto agendado</option>
+                                </select>
+
+                                <div class="form-text">
+                                    Podés seleccionar un contacto guardado o ingresar un CBU/alias manualmente.
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="destino-transferencia" class="form-label fw-bold">
+                                    CBU o alias destino
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control form-control-lg bg-light" 
+                                    id="destino-transferencia" 
+                                    placeholder="Ej: juan.perez.banco o CBU" 
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="monto-transferencia" class="form-label fw-bold">
+                                    Monto a transferir ($)
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-lg bg-light" 
+                                    id="monto-transferencia" 
+                                    min="1" 
+                                    placeholder="Ingrese el monto" 
+                                    required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="concepto-transferencia" class="form-label fw-bold">
+                                    Concepto
+                                </label>
+                                <select 
+                                    id="concepto-transferencia" 
+                                    class="form-select form-select-lg bg-light" 
+                                    required>
+                                    <option value="">Seleccione un concepto</option>
+                                    <option value="1">Alquiler</option>
+                                    <option value="2">Expensas</option>
+                                    <option value="3">Servicios</option>
+                                    <option value="4">Compra</option>
+                                    <option value="5">Devolución</option>
+                                    <option value="6">Préstamo</option>
+                                    <option value="7">Honorarios</option>
+                                    <option value="8">Varios</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary bg-banco w-100 py-2 btn-lg">
+                                Confirmar Transferencia
+                            </button>
+                        </form>
+
+                        <div id="resultado-transferencia" class="mt-4 p-3 bg-light rounded d-none">
+                            <div id="comprobante-transferencia-imprimir" class="p-3 bg-white border">
+                                <h6 class="text-success text-center fw-bold mb-3">
+                                    ¡Transferencia realizada con éxito!
+                                </h6>
+
+                                <p class="mb-1">
+                                    <strong>Destino:</strong> 
+                                    <span id="transferencia-destino">---</span>
+                                </p>
+
+                                <p class="mb-1">
+                                    <strong>Monto:</strong> 
+                                    <span id="transferencia-monto">$ --.--</span>
+                                </p>
+
+                                <p class="mb-1">
+                                    <strong>Concepto:</strong> 
+                                    <span id="transferencia-concepto">---</span>
+                                </p>
+
+                                <p class="mb-0">
+                                    <strong>Fecha:</strong> 
+                                    <span id="transferencia-fecha">--/--/----</span>
+                                </p>
+                            </div>
+
+                            <button id="btn-descargar-transferencia-pdf" class="btn btn-outline-primary w-100 mt-3">
+                                📄 Descargar Comprobante PDF
+                            </button>
+
+                            <button id="btn-agendar-contacto" class="btn btn-outline-success w-100 mt-2">
+                                Agendar contacto
+                            </button>
+                        </div>
                     </div>
                 </div>
 

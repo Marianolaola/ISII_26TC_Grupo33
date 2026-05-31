@@ -58,9 +58,63 @@ const devolverSaldoInmovilizado = async (id_cuenta,monto,conexion) => {
 };
 
 
+const verificarCuentaDestino = async (cbuAliasDestino) => {
+    const [cuentas] = await db.query(
+        `SELECT
+            cu.id_cuenta,
+            cu.id_cliente,
+            cu.cbu,
+            cu.alias,
+            cu.saldo,
+            cu.saldo_inmovilizado,
+            cl.nombre,
+            cl.apellido
+            FROM cuenta cu
+            JOIN cliente cl ON cu.id_cliente = cl.id_cliente
+            WHERE cu.cbu = ? OR cu.alias = ?`,
+            [cbuAliasDestino, cbuAliasDestino]
+    );
+
+    if (cuentas.length === 0) {
+        return {
+            ok: false,
+            mensaje: "La cuenta de destino no existe."
+        };
+    }
+
+    return {
+        ok: true,
+        cuentaDestino: cuentas[0]
+    };
+};
+
+
+const debitarSaldo = async (id_cuenta, monto, conexion) => {
+    await conexion.query(
+        `UPDATE cuenta
+        SET saldo = saldo - ?
+        WHERE id_cuenta = ?`,
+        [monto, id_cuenta]
+    );
+};
+
+const acreditarSaldo = async (id_cuenta, monto, conexion) => {
+    await conexion.query(
+        `UPDATE cuenta
+        SET saldo = saldo + ?
+        WHERE id_cuenta = ?`,
+        [monto, id_cuenta]
+    );
+};
+
+
+
 module.exports = {
     obtenerCuentaPorCliente,
     verificarSaldoDisponible,
     devolverSaldoInmovilizado,
-    consultarSaldo
+    consultarSaldo,
+    verificarCuentaDestino,
+    debitarSaldo,
+    acreditarSaldo
 };
