@@ -1,5 +1,7 @@
 const transferenciaService = require ('../services/transferenciaService');
 const Cuenta = require('../models/Cuenta');
+const Movimiento = require('../models/Movimiento');
+
 const realizarTransferencia = async (req, res) => {
     try {
         const {
@@ -40,7 +42,6 @@ const realizarTransferencia = async (req, res) => {
 
 };
 
-
 const verificarDestinoTransferencia = async (req, res) => {
     try {
         const { cbuAliasDestino } = req.params;
@@ -73,8 +74,24 @@ const verificarDestinoTransferencia = async (req, res) => {
     }
 };
 
+const obtenerConceptos = async (req, res) => {
+    try {
+        const conceptos = await Movimiento.obtenerTodosLosConceptos();
+        res.json({
+            ok: true,
+            conceptos
+        });
+    } catch (error) {
+        console.error("Error al obtener conceptos:", error);
+        res.status(500).json({
+            ok: false,
+            mensaje: "No se pudieron cargar los conceptos."
+        });
+    }
+};
 
 module.exports = {
     realizarTransferencia,
-    verificarDestinoTransferencia
+    verificarDestinoTransferencia,
+    obtenerConceptos
 };

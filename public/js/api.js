@@ -93,6 +93,17 @@ export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, i
 
 }
 
+export async function obtenerConceptosTransferencia() {
+    const respuesta = await fetch('/api/conceptos'); 
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok) {
+        throw new Error(datos.mensaje || "Error al cargar los conceptos");
+    }
+
+    return datos.conceptos;
+}
+
 // CONTACTOS -------------------------------------------------------------------------------------------
 
 export async function agendarContacto(idCliente, cbuDestinatario, nombreContacto) {

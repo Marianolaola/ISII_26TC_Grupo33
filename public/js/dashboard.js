@@ -2,6 +2,7 @@
 import * as api from './api.js';
 import * as ui from './ui.js';
 import { descargarComprobantePDF } from './pdf.js';
+import { obtenerConceptosTransferencia } from './api.js';
 
 
 
@@ -32,6 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sincronizarSaldoReal(usuario.id_cliente);
     // Carga del historial de órdenes generadas
     cargarHistorial(usuario.id_cliente);
+    // Carga de los conceptos para las transferencias
+    cargarConceptosSelect();
 
     // --- LÓGICA DEL MENÚ LATERAL
     //Basicamente guarda referencias a elementos HTML
@@ -483,5 +486,22 @@ async function sincronizarSaldoReal(id) {
         }
     } catch (err) {
         console.error("Fallo al sincronizar saldo:", err);
+    }
+}
+
+//Función que carga los conceptos de movimiento en el select del formulario de transferencia
+async function cargarConceptosSelect() {
+    try {
+        const conceptos = await obtenerConceptosTransferencia();
+        const selectConcepto = document.getElementById('concepto-transferencia');
+        
+        conceptos.forEach(concepto => {
+            const opcion = document.createElement('option');
+            opcion.value = concepto.id_concepto_movimiento;
+            opcion.textContent = concepto.nombre;
+            selectConcepto.appendChild(opcion);
+        });
+    } catch (error) {
+        console.error("Falló la carga de conceptos:", error);
     }
 }

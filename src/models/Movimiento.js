@@ -44,6 +44,12 @@ const validarConceptoMovimiento = async (id_concepto_movimiento) => {
     };
 }
 
+const obtenerTodosLosConceptos = async () => {
+    const [conceptos] = await db.query(
+        `SELECT id_concepto_movimiento, nombre FROM concepto_movimiento`
+    );
+    return conceptos;
+};
 
 const registrarMovimientoTransferencia = async (
     id_cuenta_origen,
@@ -63,5 +69,6 @@ const registrarMovimientoTransferencia = async (
 module.exports = {
     validarMontoTransferencia,
     validarConceptoMovimiento,
+    obtenerTodosLosConceptos,
     registrarMovimientoTransferencia
 }
