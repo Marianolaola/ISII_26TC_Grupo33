@@ -3,10 +3,7 @@ import * as api from './api.js';
 import * as ui from './ui.js';
 import { descargarComprobantePDF } from './pdf.js';
 import { obtenerConceptosTransferencia } from './api.js';
-
-
-
-
+import { obtenerHistorialMovimientos } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // CONTROL DE SESIÓN
@@ -60,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pantallaInicio) pantallaInicio.classList.add('d-none');
             if (pantallaExtraccion) pantallaExtraccion.classList.remove('d-none');
             if (pantallaTransferencia) pantallaTransferencia.classList.add('d-none');
+            if(pantallaMovimientos) pantallaMovimientos.classList.add('d-none');
         });
     }
 
@@ -73,8 +71,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if(pantallaInicio) pantallaInicio.classList.add('d-none');
             if(pantallaExtraccion) pantallaExtraccion.classList.add('d-none');
             if(pantallaTransferencia) pantallaTransferencia.classList.remove('d-none');
+            if(pantallaMovimientos) pantallaMovimientos.classList.add('d-none');
 
             await cargarContactosTransferencia(usuario.id_cliente);
+        });
+    }
+
+    const linkMovimientos = document.getElementById('link-movimientos');
+    const pantallaMovimientos = document.getElementById('pantalla-movimientos');
+
+    if (linkMovimientos) {
+        linkMovimientos.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            document.querySelectorAll('.menu-link').forEach(link => link.classList.remove('activo'));
+            linkMovimientos.classList.add('activo');
+
+            if(pantallaInicio) pantallaInicio.classList.add('d-none');
+            if(pantallaExtraccion) pantallaExtraccion.classList.add('d-none');
+            if(pantallaTransferencia) pantallaTransferencia.classList.add('d-none');
+            if(pantallaMovimientos) pantallaMovimientos.classList.remove('d-none');
+
+            await cargarTablaMovimientos(usuario.id_cliente);
         });
     }
 
@@ -503,5 +521,50 @@ async function cargarConceptosSelect() {
         });
     } catch (error) {
         console.error("Falló la carga de conceptos:", error);
+    }
+}
+
+// Función para cargar el historial de movimientos en la tabla de la sección de movimientos
+async function cargarTablaMovimientos(idCliente) {
+    const tbody = document.getElementById('tabla-movimientos-cuerpo');
+    if (!tbody) return;
+
+    try {
+        const resultado = await obtenerHistorialMovimientos(idCliente);
+        tbody.innerHTML = '';
+
+        if (resultado.movimientos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No hay movimientos registrados.</td></tr>';
+            return;
+        }
+
+        resultado.movimientos.forEach(mov => {
+            const tr = document.createElement('tr');
+            
+            // Formatear fecha
+            const fecha = new Date(mov.fecha_hora).toLocaleDateString('es-AR', {
+                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            // Lógica para saber si la plata entró o salió
+            const esIngreso = mov.id_cuenta_destino === resultado.id_cuenta_propia;
+            const signo = esIngreso ? '+' : '-';
+            const colorClase = esIngreso ? 'text-success' : 'text-danger';
+
+            const montoFormateado = new Intl.NumberFormat('es-AR', {
+                style: 'currency', currency: 'ARS'
+            }).format(mov.monto);
+
+            tr.innerHTML = `
+                <td>${fecha}</td>
+                <td>${mov.tipo_movimiento || 'Movimiento'}</td>
+                <td>${mov.concepto || '---'}</td>
+                <td class="fw-bold ${colorClase}">${signo} ${montoFormateado}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Error al cargar la tabla de movimientos:", error);
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al cargar el historial.</td></tr>';
     }
 }

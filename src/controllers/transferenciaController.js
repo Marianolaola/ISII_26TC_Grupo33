@@ -90,8 +90,33 @@ const obtenerConceptos = async (req, res) => {
     }
 };
 
+const obtenerHistorialMovimientos = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // 1. Buscamos la cuenta asociada al cliente
+        const cuenta = await Cuenta.obtenerCuentaPorCliente(id);
+        if (!cuenta) {
+            return res.status(404).json({ ok: false, mensaje: "Cuenta no encontrada." });
+        }
+        
+        // 2. Buscamos los movimientos de esa cuenta
+        const movimientos = await Movimiento.obtenerMovimientosPorCuenta(cuenta.id_cuenta);
+        
+        res.json({
+            ok: true,
+            id_cuenta_propia: cuenta.id_cuenta, // Mandamos esto para saber si sumó o restó
+            movimientos
+        });
+    } catch (error) {
+        console.error("Error al obtener movimientos:", error);
+        res.status(500).json({ ok: false, mensaje: "No se pudo cargar el historial." });
+    }
+};
+
 module.exports = {
     realizarTransferencia,
     verificarDestinoTransferencia,
-    obtenerConceptos
+    obtenerConceptos,
+    obtenerHistorialMovimientos
 };
