@@ -66,30 +66,9 @@ const registrarMovimientoTransferencia = async (
     );
 };
 
-const obtenerMovimientosPorCuenta = async (id_cuenta) => {
-    const [movimientos] = await db.query(
-        `SELECT 
-            m.id_movimiento,
-            m.monto,
-            m.fecha_hora,
-            m.id_cuenta_origen,
-            m.id_cuenta_destino,
-            tm.nombre AS tipo_movimiento,
-            cm.nombre AS concepto
-        FROM movimiento m
-        LEFT JOIN tipo_movimiento tm ON m.id_tipo_movimiento = tm.id_tipo_movimiento
-        LEFT JOIN concepto_movimiento cm ON m.id_concepto_movimiento = cm.id_concepto_movimiento
-        WHERE m.id_cuenta_origen = ? OR m.id_cuenta_destino = ?
-        ORDER BY m.fecha_hora DESC`,
-        [id_cuenta, id_cuenta]
-    );
-    return movimientos;
-};
-
 module.exports = {
     validarMontoTransferencia,
     validarConceptoMovimiento,
     obtenerTodosLosConceptos,
-    registrarMovimientoTransferencia,
-    obtenerMovimientosPorCuenta
+    registrarMovimientoTransferencia
 }

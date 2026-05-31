@@ -138,16 +138,5 @@ export async function obtenerContactos(idCliente) {
     return datos;
 }
 
-//MOVIMIENTOS--------------------------------------------------------------------------------------------
 
-export async function obtenerHistorialMovimientos(idCliente) {
-    const respuesta = await fetch(`/api/clientes/${idCliente}/movimientos`);
-    const datos = await respuesta.json();
-
-    if (!respuesta.ok) {
-        throw new Error(datos.mensaje || "Error al cargar los movimientos");
-    }
-
-    return datos;
-}
 
