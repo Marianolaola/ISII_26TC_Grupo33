@@ -17,7 +17,7 @@ const verificarContactoExistente = async (id_cliente, cbu_destinatario) => {
 }
 
 
-const agendarContacto = async (id_cliente, cbu_destinatario, nombre_contacto) => {
+const agendarContacto = async (id_cliente, cbu_destinatario, alias_destinatario, nombre_contacto) => {
     if(!id_cliente || !cbu_destinatario || !nombre_contacto) {
         return {
             ok: false,
@@ -37,9 +37,9 @@ const agendarContacto = async (id_cliente, cbu_destinatario, nombre_contacto) =>
 
     const [resultado] = await db.query(
         `INSERT INTO contactos
-        (id_cliente, cbu_destinatario, nombre_contacto)
-        VALUES (?, ?, ?)`,
-        [id_cliente, cbu_destinatario, nombre_contacto]
+        (id_cliente, cbu_destinatario, alias_destinatario, nombre_contacto)
+        VALUES (?, ?, ?, ?)`,
+        [id_cliente, cbu_destinatario, alias_destinatario, nombre_contacto]
     );
 
     return {
@@ -61,6 +61,7 @@ const obtenerContactosPorCliente = async (id_cliente) => {
             id_contactos,
             id_cliente,
             cbu_destinatario,
+            alias_destinatario,
             nombre_contacto
         FROM contactos
         WHERE id_cliente = ?

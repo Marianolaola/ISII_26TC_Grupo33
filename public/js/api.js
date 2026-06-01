@@ -117,13 +117,14 @@ export async function obtenerHistorialTransferencias(idCliente) {
 
 // CONTACTOS -------------------------------------------------------------------------------------------
 
-export async function agendarContacto(idCliente, cbuDestinatario, nombreContacto) {
+export async function agendarContacto(idCliente, cbuDestinatario, aliasDestinatario, nombreContacto) {
     const respuesta = await fetch('/api/contactos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             id_cliente: idCliente,
             cbu_destinatario: cbuDestinatario,
+            alias_destinatario: aliasDestinatario,
             nombre_contacto: nombreContacto
         })
     });

@@ -279,7 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
             datos.contactos.forEach(contacto => {
                 const option = document.createElement('option');
                 option.value = contacto.cbu_destinatario;
-                option.textContent = `${contacto.nombre_contacto} - ${contacto.cbu_destinatario}`;
+                
+                // Validamos por si algún contacto no tiene el alias cargado o viene nulo
+                const textoAlias = contacto.alias_destinatario ? contacto.alias_destinatario : 'Sin alias';
+                
+                // Armamos la cadena que se mostrará en el select para cada contacto
+                option.textContent = `Nombre: ${contacto.nombre_contacto} - CBU: ${contacto.cbu_destinatario} - Alias: ${textoAlias}`;
+                
                 selectContactos.appendChild(option);
             });
 
@@ -415,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resultado = await api.agendarContacto(
                     storage.id_cliente,
                     cbuDestinatario,
+                    aliasDestinatario,
                     respuesta.value.trim()
                 );
 

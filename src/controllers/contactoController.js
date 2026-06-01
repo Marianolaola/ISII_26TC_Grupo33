@@ -2,7 +2,7 @@ const Contacto = require('../models/Contacto');
 
 const agendarContacto = async (req, res) => {
     try {
-        const { id_cliente, cbu_destinatario, nombre_contacto } = req.body;
+        const { id_cliente, cbu_destinatario, alias_destinatario, nombre_contacto } = req.body;
 
         if (!id_cliente || !cbu_destinatario || !nombre_contacto) {
             return res.status(400).json({
@@ -14,6 +14,7 @@ const agendarContacto = async (req, res) => {
         const resultado = await Contacto.agendarContacto(
             id_cliente, 
             cbu_destinatario, 
+            alias_destinatario,
             nombre_contacto
         );
         
