@@ -1,27 +1,5 @@
 const db = require('../config/db');
 
-const validarMontoTransferencia = (monto) => {
-    const montoNumerico = Number(monto);
-
-    if(!montoNumerico || isNaN(montoNumerico)) {
-        return {
-            ok: false,
-            mensaje: "El monto ingresado no es válido"
-        };
-    }
-
-    if (montoNumerico <= 0) {
-        return {
-            ok: false,
-            mensaje: "El monto debe ser mayor a cero."
-        };
-    }
-
-    return {
-        ok: true,
-        monto: montoNumerico
-    };
-};
 
 const validarConceptoMovimiento = async (id_concepto_movimiento) => {
     const [conceptos] = await db.query(
@@ -88,7 +66,6 @@ const obtenerTransferenciasPorCuenta = async (id_cuenta) => {
 };
 
 module.exports = {
-    validarMontoTransferencia,
     validarConceptoMovimiento,
     obtenerTodosLosConceptos,
     registrarMovimientoTransferencia,
