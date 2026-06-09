@@ -59,21 +59,14 @@ const devolverSaldoInmovilizado = async (id_cuenta,monto,conexion) => {
 
 
 const verificarCuentaDestino = async (cbuAliasDestino) => {
-    const [cuentas] = await db.query(
-        `SELECT
-            cu.id_cuenta,
-            cu.id_cliente,
-            cu.cbu,
-            cu.alias,
-            cu.saldo,
-            cu.saldo_inmovilizado,
-            cl.nombre,
-            cl.apellido
-            FROM cuenta cu
-            JOIN cliente cl ON cu.id_cliente = cl.id_cliente
-            WHERE cu.cbu = ? OR cu.alias = ?`,
-            [cbuAliasDestino, cbuAliasDestino]
+    const [resultados] = await db.query(
+        // Utilizamos CALL para ejecutar el procedimiento almacenado
+        `CALL sp_verificar_cuenta_destino(?)`,
+        [cbuAliasDestino]
     );
+
+    // mysql2 devuelve los resultados del procedimiento almacenado en la primera posición del arreglo
+    const cuentas = resultados[0];
 
     if (cuentas.length === 0) {
         return {
