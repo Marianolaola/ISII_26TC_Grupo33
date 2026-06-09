@@ -51,6 +51,9 @@ Content-Type: application/json
   "monto": 15000
 }
 
+### CP-02.2 - Verificar historial luego del error
+GET http://localhost:3000/api/ordenes/1
+
 
 
 ### ============================================================
@@ -73,6 +76,8 @@ Content-Type: application/json
   "monto": 10000000000
 }
 
+### CP-03.2 - Verificar historial luego del error
+GET http://localhost:3000/api/ordenes/1
 
 
 ### ============================================================
@@ -113,7 +118,7 @@ POST http://localhost:3000/api/cancelar-orden
 Content-Type: application/json
 
 {
-  "id_orden": 26
+  "id_orden": 0
 }
 
 
@@ -178,3 +183,6 @@ Content-Type: application/json
   "monto": 1000,
   "id_concepto_movimiento": 8
 }
+
+### CP-06.2 - Verificar historial luego del error
+GET http://localhost:3000/api/clientes/1/transferencias
