@@ -1,0 +1,180 @@
+### ============================================================
+### CP-01 - GENERAR ORDEN DE EXTRACCIÓN VÁLIDA
+### Objetivo:
+### Verificar que un cliente con saldo suficiente pueda generar
+### una orden de extracción por $10.000.
+### Resultado esperado:
+### - ok: true
+### - token generado
+### - saldo disponible baja $10.000
+### - saldo inmovilizado sube $10.000
+### ============================================================
+
+### CP-01.1 - Consultar saldo antes de generar orden
+GET http://localhost:3000/api/saldo/1
+
+
+### CP-01.2 - Generar orden de extracción válida
+POST http://localhost:3000/api/generar-extraccion
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "monto": 10000
+}
+
+
+### CP-01.3 - Consultar saldo después de generar orden
+GET http://localhost:3000/api/saldo/1
+
+
+### CP-01.4 - Ver historial de órdenes
+GET http://localhost:3000/api/ordenes/1
+
+
+
+### ============================================================
+### CP-02 - GENERAR ORDEN CON MONTO NO MÚLTIPLO DE $10.000
+### Objetivo:
+### Verificar que el sistema rechace un monto inválido.
+### Resultado esperado:
+### - ok: false
+### - mensaje indicando que el monto debe ser múltiplo de $10.000
+### ============================================================
+
+### CP-02.1 - Generar orden con monto no múltiplo de 10000
+POST http://localhost:3000/api/generar-extraccion
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "monto": 15000
+}
+
+
+
+### ============================================================
+### CP-03 - GENERAR ORDEN CON SALDO INSUFICIENTE
+### Objetivo:
+### Verificar que el sistema rechace una extracción cuando el
+### cliente no posee saldo suficiente.
+### Resultado esperado:
+### - ok: false
+### - mensaje de saldo insuficiente
+### - no se genera orden nueva
+### ============================================================
+
+### CP-03.1 - Generar orden con saldo insuficiente
+POST http://localhost:3000/api/generar-extraccion
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "monto": 10000000000
+}
+
+
+
+### ============================================================
+### CP-04 - CANCELAR ORDEN DE EXTRACCIÓN PENDIENTE
+### Objetivo:
+### Verificar que una orden pendiente pueda cancelarse y que el
+### dinero inmovilizado vuelva al saldo disponible.
+###
+### IMPORTANTE:
+### Este caso se ejecuta en pasos.
+### No ejecutes el POST de cancelar dos veces con el mismo id_orden.
+### Si lo ejecutás dos veces, la segunda vez dará error porque
+### la orden ya no estará Pendiente.
+### ============================================================
+
+### CP-04.1 - Preparación: generar una orden nueva para cancelar
+POST http://localhost:3000/api/generar-extraccion
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "monto": 10000
+}
+
+
+### CP-04.2 - Consultar órdenes del cliente
+### Buscar la última orden con estado "Pendiente" y copiar su id_orden.
+GET http://localhost:3000/api/ordenes/1
+
+
+### CP-04.3 - Consultar saldo antes de cancelar
+GET http://localhost:3000/api/saldo/1
+
+
+### CP-04.4 - Cancelar orden de extracción pendiente
+### REEMPLAZAR el 0 por el id_orden real que salió en CP-04.2.
+POST http://localhost:3000/api/cancelar-orden
+Content-Type: application/json
+
+{
+  "id_orden": 26
+}
+
+
+### CP-04.5 - Consultar saldo después de cancelar
+GET http://localhost:3000/api/saldo/1
+
+
+### CP-04.6 - Verificar historial de órdenes después de cancelar
+GET http://localhost:3000/api/ordenes/1
+
+
+
+### ============================================================
+### CP-05 - REALIZAR TRANSFERENCIA VÁLIDA
+### Objetivo:
+### Verificar que el cliente pueda transferir dinero a una cuenta
+### destino existente.
+###
+### IMPORTANTE:
+### Cambiar ALIAS_REAL por un alias o CBU que exista en tu tabla cuenta
+### y que NO pertenezca al cliente 1.
+### ============================================================
+
+### CP-05.1 - Verificar cuenta destino existente
+GET http://localhost:3000/api/transferencia/destino/matiasgon
+
+
+### CP-05.2 - Realizar transferencia válida
+POST http://localhost:3000/api/transferencia
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "cbuAliasDestino": "matiasgon",
+  "monto": 1000,
+  "id_concepto_movimiento": 8
+}
+
+
+### CP-05.3 - Ver historial de transferencias
+GET http://localhost:3000/api/clientes/1/transferencias
+
+
+
+### ============================================================
+### CP-06 - TRANSFERENCIA CON CUENTA DESTINO INEXISTENTE
+### Objetivo:
+### Verificar que el sistema rechace una transferencia cuando
+### la cuenta destino no existe.
+### Resultado esperado:
+### - ok: false
+### - mensaje indicando que la cuenta de destino no existe
+### ============================================================
+
+### CP-06.1 - Transferencia con cuenta destino inexistente
+POST http://localhost:3000/api/transferencia
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "cbuAliasDestino": "alias.inexistente",
+  "monto": 1000,
+  "id_concepto_movimiento": 8
+}
