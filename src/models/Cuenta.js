@@ -84,18 +84,14 @@ const verificarCuentaDestino = async (cbuAliasDestino) => {
 
 const debitarSaldo = async (id_cuenta, monto, conexion) => {
     await conexion.query(
-        `UPDATE cuenta
-        SET saldo = saldo - ?
-        WHERE id_cuenta = ?`,
+        `CALL sp_debitar_saldo(?, ?)`,
         [monto, id_cuenta]
     );
 };
 
 const acreditarSaldo = async (id_cuenta, monto, conexion) => {
     await conexion.query(
-        `UPDATE cuenta
-        SET saldo = saldo + ?
-        WHERE id_cuenta = ?`,
+        `CALL sp_acreditar_saldo(?, ?)`,
         [monto, id_cuenta]
     );
 };
