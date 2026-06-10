@@ -49,16 +49,7 @@ const realizarTransferencia = async (
         throw new Error(validacionConcepto.mensaje);
     };
 
-    // 3. VERIFICAR CUENTA DESTINOO-----------------------
-
-    const validacionDestino = await Cuenta.verificarCuentaDestino(cbuAliasDestino);
-    if(!validacionDestino.ok) {
-        throw new Error(validacionDestino.mensaje);
-    };
-
-    const cuentaDestino = validacionDestino.cuentaDestino;
-
-    // 4. VERIFICAR SALDO DISPONIBLE DE LA CUENTA ORIGEN --------------------------
+    // 3. VERIFICAR SALDO DISPONIBLE DE LA CUENTA ORIGEN --------------------------
 
     const validacionSaldo = await Cuenta.verificarSaldoDisponible(id_cliente, montoValidado);
     if (!validacionSaldo.ok) {
@@ -66,6 +57,15 @@ const realizarTransferencia = async (
     };
 
     const cuentaOrigen = validacionSaldo.cuenta;
+
+    // 4. VERIFICAR CUENTA DESTINOO-----------------------
+
+    const validacionDestino = await Cuenta.verificarCuentaDestino(cbuAliasDestino);
+    if(!validacionDestino.ok) {
+        throw new Error(validacionDestino.mensaje);
+    };
+
+    const cuentaDestino = validacionDestino.cuentaDestino;
 
     // 5. EVITAR TRANSFERENCIAS A LA MISMA CUENTA ---------------------------------------
 
