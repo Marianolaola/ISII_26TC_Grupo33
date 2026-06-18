@@ -1,6 +1,6 @@
 const transferenciaService = require ('../services/transferenciaService');
 const Cuenta = require('../models/Cuenta');
-const Movimiento = require('../models/Movimiento');
+const Transferencia = require('../models/Transferencia');
 
 const realizarTransferencia = async (req, res) => {
     try {
@@ -8,10 +8,10 @@ const realizarTransferencia = async (req, res) => {
             id_cliente,
             cbuAliasDestino,
             monto,
-            id_concepto_movimiento
+            id_concepto_transferencia
         } = req.body;
 
-        if (!id_cliente || !cbuAliasDestino || !monto || !id_concepto_movimiento) {
+        if (!id_cliente || !cbuAliasDestino || !monto || !id_concepto_transferencia) {
             return res.status(400).json({
                 ok: false,
                 mensaje: "Datos faltantes o inválidos."
@@ -22,7 +22,7 @@ const realizarTransferencia = async (req, res) => {
         const resultado = await transferenciaService.realizarTransferencia(
             id_cliente,cbuAliasDestino,
             monto,
-            id_concepto_movimiento
+            id_concepto_transferencia
         );
 
         res.json({
@@ -76,7 +76,7 @@ const verificarDestinoTransferencia = async (req, res) => {
 
 const obtenerConceptos = async (req, res) => {
     try {
-        const conceptos = await Movimiento.obtenerTodosLosConceptos();
+        const conceptos = await Transferencia.obtenerTodosLosConceptos();
         res.json({
             ok: true,
             conceptos
@@ -100,12 +100,12 @@ const obtenerHistorialTransferencias = async (req, res) => {
             return res.status(404).json({ ok: false, mensaje: "Cuenta no encontrada." });
         }
         
-        const movimientos = await Movimiento.obtenerTransferenciasPorCuenta(cuenta.id_cuenta);
+        const transferencias = await Transferencia.obtenerTransferenciasPorCuenta(cuenta.id_cuenta);
         
         res.json({
             ok: true,
             id_cuenta_propia: cuenta.id_cuenta, // Mandamos esto para saber si la plata entró o salió
-            movimientos
+            transferencias
         });
     } catch (error) {
         console.error("Error al obtener el historial de transferencias:", error);

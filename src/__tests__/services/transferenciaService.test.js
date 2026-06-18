@@ -1,9 +1,9 @@
 const transferenciaService = require("../../services/transferenciaService");
-const Movimiento = require("../../models/Movimiento");
+const Transferencia = require("../../models/Transferencia");
 const Cuenta = require("../../models/Cuenta");
 const db = require("../../config/db");
 
-describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAliasDestino, monto, id_concepto_movimiento)", () => {
+describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAliasDestino, monto, id_concepto_transferencia)", () => {
   let conexionMock;
 
   beforeEach(() => {
@@ -18,10 +18,10 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
   });
 
   test("PU-07 - Debe realizar una transferencia válida cuando todos los datos son correctos", async () => {
-    vi.spyOn(Movimiento, "validarConceptoMovimiento").mockResolvedValue({
+    vi.spyOn(Transferencia, "validarConceptoTransferencia").mockResolvedValue({
       ok: true,
       concepto: {
-        id_concepto_movimiento: 8,
+        id_concepto_transferencia: 8,
         nombre: "Varios"
       }
     });
@@ -49,7 +49,10 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
     vi.spyOn(db, "getConnection").mockResolvedValue(conexionMock);
     vi.spyOn(Cuenta, "debitarSaldo").mockResolvedValue(true);
     vi.spyOn(Cuenta, "acreditarSaldo").mockResolvedValue(true);
-    vi.spyOn(Movimiento, "registrarMovimientoTransferencia").mockResolvedValue(true);
+    vi.spyOn(Transferencia, "registrarTransferencia").mockResolvedValue({
+      id_transferencia: 26,
+      codigo_operacion: "TRF-TEST-001"
+    });
 
     const resultado = await transferenciaService.realizarTransferencia(
       1,
@@ -59,6 +62,8 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
     );
 
     expect(resultado).toEqual({
+      id_transferencia: 26,
+      codigo_operacion: "TRF-TEST-001",
       id_cuenta_origen: 1,
       id_cuenta_destino: 2,
       cbu_destino: "098765432109876543218",
@@ -68,14 +73,14 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
       saldo_restante: 139000
     });
 
-    expect(Movimiento.validarConceptoMovimiento).toHaveBeenCalledWith(8);
+    expect(Transferencia.validarConceptoTransferencia).toHaveBeenCalledWith(8);
     expect(Cuenta.verificarSaldoDisponible).toHaveBeenCalledWith(1, 1000);
     expect(Cuenta.verificarCuentaDestino).toHaveBeenCalledWith("matiasgon");
 
     expect(conexionMock.beginTransaction).toHaveBeenCalled();
     expect(Cuenta.debitarSaldo).toHaveBeenCalledWith(1, 1000, conexionMock);
     expect(Cuenta.acreditarSaldo).toHaveBeenCalledWith(2, 1000, conexionMock);
-    expect(Movimiento.registrarMovimientoTransferencia).toHaveBeenCalledWith(
+    expect(Transferencia.registrarTransferencia).toHaveBeenCalledWith(
       1,
       2,
       1000,
@@ -87,7 +92,7 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
   });
 
   test("PU-08 - Debe rechazar una transferencia con monto negativo", async () => {
-    const spyConcepto = vi.spyOn(Movimiento, "validarConceptoMovimiento");
+    const spyConcepto = vi.spyOn(Transferencia, "validarConceptoTransferencia");
 
     await expect(
       transferenciaService.realizarTransferencia(1, "matiasgon", -500, 8)
@@ -97,7 +102,7 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
   });
 
   test("PU-09 - Debe rechazar una transferencia con monto no numérico", async () => {
-    const spyConcepto = vi.spyOn(Movimiento, "validarConceptoMovimiento");
+    const spyConcepto = vi.spyOn(Transferencia, "validarConceptoTransferencia");
 
     await expect(
       transferenciaService.realizarTransferencia(1, "matiasgon", "abc", 8)
@@ -107,7 +112,7 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
   });
 
   test("PU-10 - Debe rechazar una transferencia con concepto inexistente", async () => {
-    vi.spyOn(Movimiento, "validarConceptoMovimiento").mockResolvedValue({
+    vi.spyOn(Transferencia, "validarConceptoTransferencia").mockResolvedValue({
       ok: false,
       mensaje: "El concepto seleccionado no es válido."
     });
@@ -119,16 +124,16 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
       transferenciaService.realizarTransferencia(1, "matiasgon", 1000, 999)
     ).rejects.toThrow("El concepto seleccionado no es válido.");
 
-    expect(Movimiento.validarConceptoMovimiento).toHaveBeenCalledWith(999);
+    expect(Transferencia.validarConceptoTransferencia).toHaveBeenCalledWith(999);
     expect(spySaldo).not.toHaveBeenCalled();
     expect(spyDestino).not.toHaveBeenCalled();
   });
 
   test("PU-11 - Debe rechazar una transferencia cuando la cuenta destino no existe", async () => {
-    vi.spyOn(Movimiento, "validarConceptoMovimiento").mockResolvedValue({
+    vi.spyOn(Transferencia, "validarConceptoTransferencia").mockResolvedValue({
       ok: true,
       concepto: {
-        id_concepto_movimiento: 8,
+        id_concepto_transferencia: 8,
         nombre: "Varios"
       }
     });
@@ -159,10 +164,10 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
   });
 
   test("PU-12 - Debe rechazar una transferencia cuando el cliente no tiene saldo suficiente", async () => {
-    vi.spyOn(Movimiento, "validarConceptoMovimiento").mockResolvedValue({
+    vi.spyOn(Transferencia, "validarConceptoTransferencia").mockResolvedValue({
       ok: true,
       concepto: {
-        id_concepto_movimiento: 8,
+        id_concepto_transferencia: 8,
         nombre: "Varios"
       }
     });
@@ -185,10 +190,10 @@ describe("Pruebas unitarias - Contrato realizarTransferencia(id_cliente, cbuAlia
   });
 
   test("PU-13 - Debe rechazar una transferencia a la propia cuenta del cliente", async () => {
-    vi.spyOn(Movimiento, "validarConceptoMovimiento").mockResolvedValue({
+    vi.spyOn(Transferencia, "validarConceptoTransferencia").mockResolvedValue({
       ok: true,
       concepto: {
-        id_concepto_movimiento: 8,
+        id_concepto_transferencia: 8,
         nombre: "Varios"
       }
     });

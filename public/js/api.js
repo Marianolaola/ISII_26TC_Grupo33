@@ -70,7 +70,7 @@ export async function verificarDestinoTransferencia(cbuAliasDestino) {
 }
 
 
-export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, idConceptoMovimiento) {
+export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, idConceptoTransferencia) {
     
     const respuesta = await fetch('/api/transferencia', {
         method: 'POST',
@@ -79,7 +79,7 @@ export async function realizarTransferencia(idCliente, cbuAliasDestino, monto, i
             id_cliente: idCliente,
             cbuAliasDestino,
             monto,
-            id_concepto_movimiento: idConceptoMovimiento
+            id_concepto_transferencia: idConceptoTransferencia
         })
     });
 
