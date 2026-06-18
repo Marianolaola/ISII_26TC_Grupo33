@@ -76,7 +76,7 @@ const verificarDestinoTransferencia = async (req, res) => {
 
 const obtenerConceptos = async (req, res) => {
     try {
-        const conceptos = await Transferencia.obtenerTodosLosConceptos();
+        const conceptos = await Transferencia.obtenerConceptosTransferencia();
         res.json({
             ok: true,
             conceptos

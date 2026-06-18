@@ -2,29 +2,6 @@ const db = require('../config/db');
 const Transferencia = require('../models/Transferencia');
 const Cuenta = require('../models/Cuenta');
 
-// VALIDAR MONTO TRANSFERENCIA
-const validarMontoTransferencia = (monto) => {
-    const montoNumerico = Number(monto);
-
-    if (!montoNumerico || isNaN(montoNumerico)) {
-        return {
-            ok: false,
-            mensaje: "El monto ingresado no es válido"
-        };
-    }
-
-    if (montoNumerico <= 0) {
-        return {
-            ok: false,
-            mensaje: "El monto debe ser mayor a cero."
-        };
-    }
-
-    return {
-        ok: true,
-        monto: montoNumerico
-    };
-};
 
 const realizarTransferencia = async (
     id_cliente,
@@ -117,6 +94,5 @@ const realizarTransferencia = async (
 };
 
 module.exports = {
-    realizarTransferencia,
-    validarMontoTransferencia
+    realizarTransferencia
 };
