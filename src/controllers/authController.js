@@ -1,4 +1,5 @@
 const Usuario = require('../models/Usuario');
+const { buscarPorId } = require('../models/Cliente'); // Importamos el método del Cliente acá arriba
 const bcrypt = require('bcrypt');
 
 // Se define la función de login
@@ -8,9 +9,8 @@ const login = async (req, res) => {
     const {email, password } = req.body;
 
     try {
-
         //Pedimos al Modelo que busque por email
-        const usuarioLogueado = await Usuario.buscarPorEmail (email);
+        const usuarioLogueado = await Usuario.buscarPorEmail(email);
         
         //Caso error en el login
         if (!usuarioLogueado){
@@ -25,27 +25,32 @@ const login = async (req, res) => {
             return res.status(401).json({mensaje: '❌ Email o contraseña incorrectos' });
         }
 
+        // 2. ACÁ APLICAMOS EL MÉTODO DEL DIAGRAMA
+        // Buscamos los datos puros del cliente usando el ID que nos dio el login
+        const datosTitular = await buscarPorId(usuarioLogueado.id_cliente);
+
         //Caso del login correcto
         res.json ({
             mensaje: '✅ ¡Bienvenido al sistema!',
             usuario: {
                 id_usuario: usuarioLogueado.id_usuario,
                 id_cliente: usuarioLogueado.id_cliente,
-                nombre: usuarioLogueado.nombre,
-                apellido: usuarioLogueado.apellido,
                 email: usuarioLogueado.email,
-                id_tipo_rol: usuarioLogueado.id_tipo_rol
+                id_tipo_rol: usuarioLogueado.id_tipo_rol,
+                // Usamos los datos que trajimos directamente desde la entidad Cliente
+                nombre: datosTitular.nombre,
+                apellido: datosTitular.apellido
             }
         });
 
-    }catch (error) {
+    } catch (error) {
         //Si falla la base de datos, se generá el error
         console.error("Error en el login:", error);
         res.status(500).json({
-            mensaje: '❌ Error interno del servidor (tomate un mate mientras tanto)'
+            mensaje: '❌ Error interno del servidor'
         });
     }
-
 };
+
 //Exportamos la función para que todos los archivos la usen
 module.exports = { login };
