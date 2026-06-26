@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return Swal.fire({
                         icon: 'warning',
                         title: 'Saldo insuficiente',
-                        text: `Tu saldo disponible es de ${new Intl.NumberFormat('es-AR', {
+                        text: `Tu saldo actual es de ${new Intl.NumberFormat('es-AR', {
                             style: 'currency',
                             currency: 'ARS'
                         }).format(saldoDisponible)}.`,
