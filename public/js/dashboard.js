@@ -196,6 +196,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
+            // Validar saldo antes de mostrar el cartel de confirmación
+            let saldoDisponible;
+
+            try {
+                const respuestaSaldo = await api.obtenerSaldo(storage.id_cliente);
+                saldoDisponible = Number(respuestaSaldo.saldo_real);
+
+                if (!Number.isFinite(saldoDisponible)) {
+                    throw new Error("No se pudo obtener el saldo disponible.");
+                }
+
+                if (montoTransferencia > saldoDisponible) {
+                    return Swal.fire({
+                        icon: 'warning',
+                        title: 'Saldo insuficiente',
+                        text: `Tu saldo disponible es de ${new Intl.NumberFormat('es-AR', {
+                            style: 'currency',
+                            currency: 'ARS'
+                        }).format(saldoDisponible)}.`,
+                        confirmButtonColor: '#0b5ed7'
+                    });
+                }
+
+            } catch (error) {
+                return Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo validar el saldo',
+                    text: error.message || 'Intentá nuevamente.',
+                    confirmButtonColor: '#0b5ed7'
+                });
+            }
+
             const nombreDestino = `${datosDestino.nombre} ${datosDestino.apellido}`;
 
             const confirmacion = await Swal.fire({
