@@ -162,9 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const cbuAliasDestino = document.getElementById('destino-transferencia').value.trim();
             const montoTransferencia = parseFloat(document.getElementById('monto-transferencia').value);
-            const idConceptoMovimiento = parseInt(document.getElementById('concepto-transferencia').value);
+            const idConceptoTransferencia = parseInt(document.getElementById('concepto-transferencia').value);
 
-            if (!cbuAliasDestino || !montoTransferencia || !idConceptoMovimiento) {
+            if (!cbuAliasDestino || !montoTransferencia || !idConceptoTransferencia) {
                 return Swal.fire({
                     icon: 'warning',
                     title: 'Datos incompletos',
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     storage.id_cliente,
                     cbuAliasDestino,
                     montoTransferencia,
-                    idConceptoMovimiento
+                    idConceptoTransferencia
                 );
 
                 if(resultado.ok) {
@@ -502,7 +502,7 @@ async function cargarConceptosSelect() {
         
         conceptos.forEach(concepto => {
             const opcion = document.createElement('option');
-            opcion.value = concepto.id_concepto_movimiento;
+            opcion.value = concepto.id_concepto_transferencia;
             opcion.textContent = concepto.nombre;
             selectConcepto.appendChild(opcion);
         });
@@ -520,31 +520,31 @@ async function cargarTablaTransferencias(idCliente) {
         const resultado = await obtenerHistorialTransferencias(idCliente);
         tbody.innerHTML = '';
 
-        if (resultado.movimientos.length === 0) {
+        if (resultado.transferencias.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No hay transferencias registradas.</td></tr>';
             return;
         }
 
-        resultado.movimientos.forEach(mov => {
+        resultado.transferencias.forEach(transferencia => {
             const tr = document.createElement('tr');
             
-            const fecha = new Date(mov.fecha_hora).toLocaleDateString('es-AR', {
+            const fecha = new Date(transferencia.fecha_hora).toLocaleDateString('es-AR', {
                 day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
 
             // Lógica para saber si es ingreso (+) o egreso (-)
-            const esIngreso = mov.id_cuenta_destino === resultado.id_cuenta_propia;
+            const esIngreso = transferencia.id_cuenta_destino === resultado.id_cuenta_propia;
             const signo = esIngreso ? '+' : '-';
             const colorClase = esIngreso ? 'text-success' : 'text-danger';
 
             const montoFormateado = new Intl.NumberFormat('es-AR', {
                 style: 'currency', currency: 'ARS'
-            }).format(mov.monto);
+            }).format(transferencia.monto);
 
             tr.innerHTML = `
                 <td>${fecha}</td>
-                <td>${mov.tipo_movimiento || 'Transferencia'}</td>
-                <td>${mov.concepto || '---'}</td>
+                <td>Transferencia</td>
+                <td>${transferencia.concepto || '---'}</td>
                 <td class="fw-bold ${colorClase}">${signo} ${montoFormateado}</td>
             `;
             tbody.appendChild(tr);

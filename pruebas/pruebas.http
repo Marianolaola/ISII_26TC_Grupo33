@@ -67,7 +67,7 @@ Content-Type: application/json
 ### CP-1 (El monto es válido)
 ### CP-5: Verificar cuenta destino (Cuenta existente)
 ### CP-3 (El saldo es suficiente)
-### CP-7 (Debita origen, acredita destino, registra movimiento)
+### CP-7 (Debita origen, acredita destino, registra transferencia)
 ### Resultado esperado: Sistema realiza la operación y muestra “¡Transferencia realizada con éxito!”
 POST http://localhost:3000/api/transferencia
 Content-Type: application/json
@@ -76,7 +76,7 @@ Content-Type: application/json
   "id_cliente": 1,
   "cbuAliasDestino": "matiasgon",
   "monto": 1500,
-  "id_concepto_movimiento": 8
+  "id_concepto_transferencia": 8
 }
 
 
@@ -91,7 +91,7 @@ Content-Type: application/json
   "id_cliente": 1,
   "cbuAliasDestino": "matiasgon",
   "monto": -500,
-  "id_concepto_movimiento": 8
+  "id_concepto_transferencia": 8
 }
 
 
@@ -106,7 +106,7 @@ Content-Type: application/json
   "id_cliente": 1,
   "cbuAliasDestino": "matiasgon",
   "monto": 9999999,
-  "id_concepto_movimiento": 8
+  "id_concepto_transferencia": 8
 }
 
 ### CP-6: Verificar cuenta destino (Cuenta inexistente)
@@ -126,7 +126,7 @@ Content-Type: application/json
   "id_cliente": 999,
   "cbuAliasDestino": "matiasgon",
   "monto": 1500,
-  "id_concepto_movimiento": 8
+  "id_concepto_transferencia": 8
 }
 
 

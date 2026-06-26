@@ -47,28 +47,28 @@ INSERT INTO `cliente` VALUES (1,'11222333','Mariano','Laola','3794123456','2000-
 UNLOCK TABLES;
 
 --
--- Table structure for table `concepto_movimiento`
+-- Table structure for table `concepto_transferencia`
 --
 
-DROP TABLE IF EXISTS `concepto_movimiento`;
+DROP TABLE IF EXISTS `concepto_transferencia`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `concepto_movimiento` (
-  `id_concepto_movimiento` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `concepto_transferencia` (
+  `id_concepto_transferencia` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_concepto_movimiento`),
+  PRIMARY KEY (`id_concepto_transferencia`),
   UNIQUE KEY `nombre` (`nombre`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `concepto_movimiento`
+-- Dumping data for table `concepto_transferencia`
 --
 
-LOCK TABLES `concepto_movimiento` WRITE;
-/*!40000 ALTER TABLE `concepto_movimiento` DISABLE KEYS */;
-INSERT INTO `concepto_movimiento` VALUES (1,'Alquiler'),(4,'Compra'),(5,'Devolución'),(2,'Expensas'),(7,'Honorarios'),(6,'Préstamo'),(3,'Servicios'),(8,'Varios');
-/*!40000 ALTER TABLE `concepto_movimiento` ENABLE KEYS */;
+LOCK TABLES `concepto_transferencia` WRITE;
+/*!40000 ALTER TABLE `concepto_transferencia` DISABLE KEYS */;
+INSERT INTO `concepto_transferencia` VALUES (1,'Alquiler'),(4,'Compra'),(5,'Devolución'),(2,'Expensas'),(7,'Honorarios'),(6,'Préstamo'),(3,'Servicios'),(8,'Varios');
+/*!40000 ALTER TABLE `concepto_transferencia` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -134,7 +134,7 @@ CREATE TABLE `cuenta` (
 
 LOCK TABLES `cuenta` WRITE;
 /*!40000 ALTER TABLE `cuenta` DISABLE KEYS */;
-INSERT INTO `cuenta` VALUES (1,1,1,1,'1234567891234567891234','marianolaola',31676.00,320000.00),(2,2,1,1,'098765432109876543218','matiasgon',113324.00,0.00),(3,3,1,1,'321654987123456789000','juanGar',135000.00,0.00),(4,4,1,1,'321654987123456789001','joseper',540000.00,0.00);
+INSERT INTO `cuenta` VALUES (1,1,1,1,'1234567891234567891234','marianolaola',18176.00,330000.00),(2,2,1,1,'098765432109876543218','matiasgon',116324.00,0.00),(3,3,1,1,'321654987123456789000','juanGar',135000.00,0.00),(4,4,1,1,'321654987123456789001','joseper',540500.00,0.00);
 /*!40000 ALTER TABLE `cuenta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,40 +187,28 @@ INSERT INTO `estado_orden` VALUES (1,'Pendiente'),(2,'Completada'),(3,'Vencida')
 UNLOCK TABLES;
 
 --
--- Table structure for table `movimiento`
+-- Table structure for table `estado_transferencia`
 --
 
-DROP TABLE IF EXISTS `movimiento`;
+DROP TABLE IF EXISTS `estado_transferencia`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `movimiento` (
-  `id_movimiento` int NOT NULL AUTO_INCREMENT,
-  `id_cuenta_origen` int NOT NULL,
-  `id_cuenta_destino` int NOT NULL,
-  `id_tipo_movimiento` int NOT NULL,
-  `monto` decimal(15,2) DEFAULT NULL,
-  `fecha_hora` datetime NOT NULL,
-  `id_concepto_movimiento` int NOT NULL,
-  PRIMARY KEY (`id_movimiento`),
-  KEY `id_cuenta_origen` (`id_cuenta_origen`),
-  KEY `id_cuenta_destino` (`id_cuenta_destino`),
-  KEY `id_tipo_movimiento` (`id_tipo_movimiento`),
-  KEY `fk_movimiento_concepto` (`id_concepto_movimiento`),
-  CONSTRAINT `fk_movimiento_concepto` FOREIGN KEY (`id_concepto_movimiento`) REFERENCES `concepto_movimiento` (`id_concepto_movimiento`),
-  CONSTRAINT `movimiento_ibfk_1` FOREIGN KEY (`id_cuenta_origen`) REFERENCES `cuenta` (`id_cuenta`),
-  CONSTRAINT `movimiento_ibfk_2` FOREIGN KEY (`id_cuenta_destino`) REFERENCES `cuenta` (`id_cuenta`),
-  CONSTRAINT `movimiento_ibfk_3` FOREIGN KEY (`id_tipo_movimiento`) REFERENCES `tipo_movimiento` (`id_tipo_movimiento`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `estado_transferencia` (
+  `id_estado_transferencia` int NOT NULL AUTO_INCREMENT,
+  `descripcion` varchar(50) NOT NULL,
+  PRIMARY KEY (`id_estado_transferencia`),
+  UNIQUE KEY `descripcion_UNIQUE` (`descripcion`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `movimiento`
+-- Dumping data for table `estado_transferencia`
 --
 
-LOCK TABLES `movimiento` WRITE;
-/*!40000 ALTER TABLE `movimiento` DISABLE KEYS */;
-INSERT INTO `movimiento` VALUES (1,1,2,1,10000.00,'2026-05-25 19:55:24',8),(2,1,2,1,30000.00,'2026-05-25 20:05:02',6),(3,1,3,1,20000.00,'2026-05-25 20:21:51',4),(4,1,2,1,10000.00,'2026-05-25 20:22:44',7),(5,1,3,1,10000.00,'2026-05-25 20:23:23',6),(6,1,3,1,10000.00,'2026-05-25 20:35:48',6),(7,1,2,1,10000.00,'2026-05-30 21:59:35',8),(8,1,2,1,20000.00,'2026-05-30 22:01:22',1),(9,1,2,1,1324.00,'2026-05-30 22:10:26',8),(10,1,3,1,10000.00,'2026-05-30 22:43:31',6),(11,1,4,1,10000.00,'2026-05-30 22:51:24',3),(12,1,2,1,1000.00,'2026-05-31 20:34:25',8),(13,1,4,1,3000.00,'2026-05-31 21:04:57',8),(14,1,4,1,3000.00,'2026-05-31 21:06:04',8),(15,1,4,1,2000.00,'2026-05-31 21:07:22',3),(16,1,2,1,1000.00,'2026-06-04 13:03:57',8),(17,1,4,1,1000.00,'2026-06-04 13:10:48',8),(18,2,1,1,10000.00,'2026-06-04 13:14:44',8),(19,1,4,1,10000.00,'2026-06-07 13:42:36',8),(20,2,4,1,10000.00,'2026-06-07 13:53:47',8),(21,1,4,1,1000.00,'2026-06-08 21:20:04',8),(22,1,3,1,5000.00,'2026-06-08 21:30:09',7);
-/*!40000 ALTER TABLE `movimiento` ENABLE KEYS */;
+LOCK TABLES `estado_transferencia` WRITE;
+/*!40000 ALTER TABLE `estado_transferencia` DISABLE KEYS */;
+INSERT INTO `estado_transferencia` VALUES (1,'Completada'),(3,'Fallida'),(4,'Pendiente'),(2,'Rechazada');
+/*!40000 ALTER TABLE `estado_transferencia` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -243,7 +231,7 @@ CREATE TABLE `orden_extraccion` (
   KEY `id_estado_orden` (`id_estado_orden`),
   CONSTRAINT `orden_extraccion_ibfk_1` FOREIGN KEY (`id_cuenta`) REFERENCES `cuenta` (`id_cuenta`),
   CONSTRAINT `orden_extraccion_ibfk_2` FOREIGN KEY (`id_estado_orden`) REFERENCES `estado_orden` (`id_estado_orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -252,7 +240,7 @@ CREATE TABLE `orden_extraccion` (
 
 LOCK TABLES `orden_extraccion` WRITE;
 /*!40000 ALTER TABLE `orden_extraccion` DISABLE KEYS */;
-INSERT INTO `orden_extraccion` VALUES (2,1,1,'879011',20000.00,'2026-04-19 21:18:21','2026-04-20 21:18:21'),(3,1,1,'140994',10000.00,'2026-04-19 22:14:04','2026-04-20 22:14:04'),(4,1,4,'407677',10000.00,'2026-04-19 22:16:23','2026-04-20 22:16:23'),(5,1,4,'788198',10000.00,'2026-04-19 22:17:49','2026-04-20 22:17:49'),(6,1,1,'157080',10000.00,'2026-04-19 22:19:08','2026-04-20 22:19:08'),(7,1,1,'734990',20000.00,'2026-04-19 22:28:55','2026-04-20 22:28:55'),(8,1,4,'422688',20000.00,'2026-04-19 23:13:21','2026-04-20 23:13:21'),(9,1,1,'527119',10000.00,'2026-04-19 23:14:13','2026-04-20 23:14:13'),(10,1,1,'501233',200000.00,'2026-04-19 23:14:48','2026-04-20 23:14:48'),(11,1,4,'783793',10000.00,'2026-04-19 23:56:37','2026-04-20 23:56:37'),(12,1,4,'429204',10000.00,'2026-04-20 00:10:54','2026-04-21 00:10:54'),(13,1,4,'916583',20000.00,'2026-04-21 22:24:29','2026-04-22 22:24:29'),(14,1,4,'441423',10000.00,'2026-04-23 15:38:50','2026-04-24 15:38:50'),(15,1,4,'358845',10000.00,'2026-04-23 15:40:28','2026-04-24 15:40:28'),(16,1,4,'100904',20000.00,'2026-04-26 23:03:14','2026-04-27 23:03:14'),(17,1,4,'314822',10000.00,'2026-05-15 18:04:56','2026-05-16 18:04:56'),(18,1,4,'231141',210000.00,'2026-05-15 18:07:37','2026-05-16 18:07:37'),(19,1,4,'919802',10000.00,'2026-05-15 18:24:06','2026-05-16 18:24:06'),(20,1,4,'338542',10000.00,'2026-05-19 15:20:37','2026-05-20 15:20:37'),(21,1,4,'287059',10000.00,'2026-05-19 15:20:59','2026-05-20 15:20:59'),(22,1,1,'139679',20000.00,'2026-05-30 23:10:19','2026-05-31 23:10:19'),(23,1,2,'847924',20000.00,'2026-05-30 23:23:10','2026-05-31 23:23:10'),(24,1,1,'727766',10000.00,'2026-06-04 11:35:38','2026-06-05 11:35:38'),(25,1,4,'230539',10000.00,'2026-06-04 11:45:01','2026-06-05 11:45:01');
+INSERT INTO `orden_extraccion` VALUES (2,1,1,'879011',20000.00,'2026-04-19 21:18:21','2026-04-20 21:18:21'),(3,1,1,'140994',10000.00,'2026-04-19 22:14:04','2026-04-20 22:14:04'),(4,1,4,'407677',10000.00,'2026-04-19 22:16:23','2026-04-20 22:16:23'),(5,1,4,'788198',10000.00,'2026-04-19 22:17:49','2026-04-20 22:17:49'),(6,1,1,'157080',10000.00,'2026-04-19 22:19:08','2026-04-20 22:19:08'),(7,1,1,'734990',20000.00,'2026-04-19 22:28:55','2026-04-20 22:28:55'),(8,1,4,'422688',20000.00,'2026-04-19 23:13:21','2026-04-20 23:13:21'),(9,1,1,'527119',10000.00,'2026-04-19 23:14:13','2026-04-20 23:14:13'),(10,1,1,'501233',200000.00,'2026-04-19 23:14:48','2026-04-20 23:14:48'),(11,1,4,'783793',10000.00,'2026-04-19 23:56:37','2026-04-20 23:56:37'),(12,1,4,'429204',10000.00,'2026-04-20 00:10:54','2026-04-21 00:10:54'),(13,1,4,'916583',20000.00,'2026-04-21 22:24:29','2026-04-22 22:24:29'),(14,1,4,'441423',10000.00,'2026-04-23 15:38:50','2026-04-24 15:38:50'),(15,1,4,'358845',10000.00,'2026-04-23 15:40:28','2026-04-24 15:40:28'),(16,1,4,'100904',20000.00,'2026-04-26 23:03:14','2026-04-27 23:03:14'),(17,1,4,'314822',10000.00,'2026-05-15 18:04:56','2026-05-16 18:04:56'),(18,1,4,'231141',210000.00,'2026-05-15 18:07:37','2026-05-16 18:07:37'),(19,1,4,'919802',10000.00,'2026-05-15 18:24:06','2026-05-16 18:24:06'),(20,1,4,'338542',10000.00,'2026-05-19 15:20:37','2026-05-20 15:20:37'),(21,1,4,'287059',10000.00,'2026-05-19 15:20:59','2026-05-20 15:20:59'),(22,1,1,'139679',20000.00,'2026-05-30 23:10:19','2026-05-31 23:10:19'),(23,1,2,'847924',20000.00,'2026-05-30 23:23:10','2026-05-31 23:23:10'),(24,1,1,'727766',10000.00,'2026-06-04 11:35:38','2026-06-05 11:35:38'),(25,1,4,'230539',10000.00,'2026-06-04 11:45:01','2026-06-05 11:45:01'),(26,1,4,'242835',10000.00,'2026-06-08 22:38:36','2026-06-09 22:38:36'),(27,1,1,'958238',10000.00,'2026-06-22 20:36:47','2026-06-23 20:36:47');
 /*!40000 ALTER TABLE `orden_extraccion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -281,30 +269,6 @@ INSERT INTO `tipo_cuenta` VALUES (1,'Caja de Ahorros Pesos');
 UNLOCK TABLES;
 
 --
--- Table structure for table `tipo_movimiento`
---
-
-DROP TABLE IF EXISTS `tipo_movimiento`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tipo_movimiento` (
-  `id_tipo_movimiento` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(50) NOT NULL,
-  PRIMARY KEY (`id_tipo_movimiento`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tipo_movimiento`
---
-
-LOCK TABLES `tipo_movimiento` WRITE;
-/*!40000 ALTER TABLE `tipo_movimiento` DISABLE KEYS */;
-INSERT INTO `tipo_movimiento` VALUES (1,'Transferencia'),(2,'Extracción');
-/*!40000 ALTER TABLE `tipo_movimiento` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `tipo_rol`
 --
 
@@ -326,6 +290,45 @@ LOCK TABLES `tipo_rol` WRITE;
 /*!40000 ALTER TABLE `tipo_rol` DISABLE KEYS */;
 INSERT INTO `tipo_rol` VALUES (2,'Cliente');
 /*!40000 ALTER TABLE `tipo_rol` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transferencia`
+--
+
+DROP TABLE IF EXISTS `transferencia`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transferencia` (
+  `id_transferencia` int NOT NULL AUTO_INCREMENT,
+  `id_cuenta_origen` int NOT NULL,
+  `id_cuenta_destino` int NOT NULL,
+  `monto` decimal(15,2) DEFAULT NULL,
+  `codigo_operacion` varchar(45) NOT NULL,
+  `fecha_hora` datetime NOT NULL,
+  `id_concepto_transferencia` int NOT NULL,
+  `id_estado_transferencia` int NOT NULL,
+  PRIMARY KEY (`id_transferencia`),
+  UNIQUE KEY `codigo_operacion_UNIQUE` (`codigo_operacion`),
+  KEY `id_cuenta_origen` (`id_cuenta_origen`),
+  KEY `id_cuenta_destino` (`id_cuenta_destino`),
+  KEY `fk_transferencia_estado_idx` (`id_estado_transferencia`),
+  KEY `fk_transferencia_concepto_idx` (`id_concepto_transferencia`),
+  CONSTRAINT `fk_transferencia_concepto` FOREIGN KEY (`id_concepto_transferencia`) REFERENCES `concepto_transferencia` (`id_concepto_transferencia`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_transferencia_estado` FOREIGN KEY (`id_estado_transferencia`) REFERENCES `estado_transferencia` (`id_estado_transferencia`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `transferencia_ibfk_1` FOREIGN KEY (`id_cuenta_origen`) REFERENCES `cuenta` (`id_cuenta`),
+  CONSTRAINT `transferencia_ibfk_2` FOREIGN KEY (`id_cuenta_destino`) REFERENCES `cuenta` (`id_cuenta`)
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transferencia`
+--
+
+LOCK TABLES `transferencia` WRITE;
+/*!40000 ALTER TABLE `transferencia` DISABLE KEYS */;
+INSERT INTO `transferencia` VALUES (1,1,2,10000.00,'TRF-000001','2026-05-25 19:55:24',8,1),(2,1,2,30000.00,'TRF-000002','2026-05-25 20:05:02',6,1),(3,1,3,20000.00,'TRF-000003','2026-05-25 20:21:51',4,1),(4,1,2,10000.00,'TRF-000004','2026-05-25 20:22:44',7,1),(5,1,3,10000.00,'TRF-000005','2026-05-25 20:23:23',6,1),(6,1,3,10000.00,'TRF-000006','2026-05-25 20:35:48',6,1),(7,1,2,10000.00,'TRF-000007','2026-05-30 21:59:35',8,1),(8,1,2,20000.00,'TRF-000008','2026-05-30 22:01:22',1,1),(9,1,2,1324.00,'TRF-000009','2026-05-30 22:10:26',8,1),(10,1,3,10000.00,'TRF-000010','2026-05-30 22:43:31',6,1),(11,1,4,10000.00,'TRF-000011','2026-05-30 22:51:24',3,1),(12,1,2,1000.00,'TRF-000012','2026-05-31 20:34:25',8,1),(13,1,4,3000.00,'TRF-000013','2026-05-31 21:04:57',8,1),(14,1,4,3000.00,'TRF-000014','2026-05-31 21:06:04',8,1),(15,1,4,2000.00,'TRF-000015','2026-05-31 21:07:22',3,1),(16,1,2,1000.00,'TRF-000016','2026-06-04 13:03:57',8,1),(17,1,4,1000.00,'TRF-000017','2026-06-04 13:10:48',8,1),(18,2,1,10000.00,'TRF-000018','2026-06-04 13:14:44',8,1),(19,1,4,10000.00,'TRF-000019','2026-06-07 13:42:36',8,1),(20,2,4,10000.00,'TRF-000020','2026-06-07 13:53:47',8,1),(21,1,4,1000.00,'TRF-000021','2026-06-08 21:20:04',8,1),(22,1,3,5000.00,'TRF-000022','2026-06-08 21:30:09',7,1),(23,1,2,1000.00,'TRF-000023','2026-06-08 22:31:29',8,1),(24,1,2,1000.00,'TRF-000024','2026-06-08 22:32:18',8,1),(25,1,2,1000.00,'TRF-000025','2026-06-08 22:40:10',8,1),(26,1,4,500.00,'TRF-20260622203625-4E4BDF7E','2026-06-22 20:36:25',8,1);
+/*!40000 ALTER TABLE `transferencia` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -446,4 +449,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-06-08 22:28:52
+-- Dump completed on 2026-06-22 22:19:49
