@@ -63,11 +63,12 @@ Content-Type: application/json
 ### PLAN DE PRUEBAS - REALIZAR TRANSFERENCIA
 ### ============================================================
 
-### CP-1, CP-3, CP-5 y CP-7: Flujo Normal Exitoso de Transferencia
+### CP-1, CP-3, CP-5, CP-7 y CP-9: Flujo Normal Exitoso de Transferencia
 ### CP-1 (El monto es válido)
-### CP-5: Verificar cuenta destino (Cuenta existente)
-### CP-3 (El saldo es suficiente)
-### CP-7 (Debita origen, acredita destino, registra transferencia)
+### CP-3 (El concepto es válido)
+### CP-5 (El saldo es suficiente)
+### CP-7 (La cuenta destino existe)
+### CP-9 (Debita origen, acredita destino, registra transferencia)
 ### Resultado esperado: Sistema realiza la operación y muestra “¡Transferencia realizada con éxito!”
 POST http://localhost:3000/api/transferencia
 Content-Type: application/json
@@ -94,8 +95,21 @@ Content-Type: application/json
   "id_concepto_transferencia": 8
 }
 
+### CP-4: Verificar concepto (concepto no válido)
+### Objetivo: Verifica que el concepto de transferencia sea válido.
+### Datos de entrada: id_concepto_transferencia: 999 (dato no válido)
+### Resultado esperado: El concepto es inválido. Sistema muestra mensaje de error.
+POST http://localhost:3000/api/transferencia
+Content-Type: application/json
 
-### CP-4: Verificar saldo (Saldo insuficiente)
+{
+  "id_cliente": 1,
+  "cbuAliasDestino": "matiasgon",
+  "monto": 1500,
+  "id_concepto_transferencia": 999
+}
+
+### CP-6: Verificar saldo (Saldo insuficiente)
 ### Objetivo: Verifica que el saldo sea suficiente.
 ### Datos de entrada: id_cliente: 1; monto: 9999999 (saldo insuficiente)
 ### Resultado esperado: El saldo es insuficiente. Sistema muestra: “Saldo insuficiente. Tu saldo actual es de $...”
@@ -109,13 +123,13 @@ Content-Type: application/json
   "id_concepto_transferencia": 8
 }
 
-### CP-6: Verificar cuenta destino (Cuenta inexistente)
+### CP-8: Verificar cuenta destino (Cuenta inexistente)
 ### Objetivo: Verificar que la cuenta destino exista.
 ### Datos de entrada: cbuAliasDestino: "alias.falso" (dato no válido)
 ### Resultado esperado: Cuenta inexistente. Sistema muestra mensaje: “La cuenta de destino no existe.”
 GET http://localhost:3000/api/transferencia/destino/alias.falso
 
-### CP-8: Registrar transferencia (Datos incorrectos)
+### CP-10: Registrar transferencia (Datos incorrectos)
 ### Objetivo: Probar el rechazo ante datos inconsistentes en la transacción.
 ### Datos de entrada: id_cliente: 999; monto: 1500
 ### Resultado esperado: Datos incorrectos. Sistema muestra mensaje según el error.
@@ -130,7 +144,7 @@ Content-Type: application/json
 }
 
 
-### CP-9: Agendar contacto
+### CP-11: Agendar contacto
 ### Objetivo: Guardar contacto tras transferencia exitosa.
 ### Datos de entrada: id_cliente: 3; alias_destinatario: "matiasgon"; nombre_contacto: "Matías"
 ### Resultado esperado: El sistema guarda los datos del destinatario.
